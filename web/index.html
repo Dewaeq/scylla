@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>SCYLLA</title>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overscroll-behavior: contain;
+      touch-action: none;
+    }
+
+    body {
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+      color: rgb(128, 128, 128);
+      font-size: xx-large;
+      display: flex;
+      flex-direction: column;
+      align-content: space-between;
+    }
+
+    .sliders {
+      display: flex;
+      height: 100%;
+      align-items: center;
+      margin-right: 40px;
+    }
+
+    .slider-container {
+      height: 100%;
+      width: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slider {
+      appearance: none;
+      background: #d3d3d3;
+      outline: none;
+      opacity: 0.7;
+      transition: opacity .2s;
+    }
+
+    .slider:hover {
+      opacity: 1;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 25px;
+      height: 25px;
+      background: #04AA6D;
+      cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+      width: 25px;
+      height: 25px;
+      background: #04AA6D;
+      cursor: pointer;
+    }
+
+    .h-slider {
+      width: 100%;
+      height: 25px;
+    }
+
+    .v-slider {
+      transform: rotate(270deg);
+      width: 100%;
+      height: 25px;
+    }
+  </style>
+
+  <script>
+    let vSlider, hSlider, throttleText, turnText;
+    const ws = new WebSocket(`ws://${window.location.hostname}:81`);
+
+    let prevTurn = null;
+    let prevThrottle = null;
+
+    window.onload = () => {
+      vSlider = document.getElementById("v-slider");
+      hSlider = document.getElementById("h-slider");
+      throttleText = document.getElementById("throttle");
+      turnText = document.getElementById("turn");
+
+      vSlider.oninput = () => onInput();
+      hSlider.oninput = () => onInput();
+
+      vSlider.addEventListener("pointerup", resetSliders);
+      vSlider.addEventListener("touchend", resetSliders);
+      hSlider.addEventListener("pointerup", resetSliders);
+      hSlider.addEventListener("touchend", resetSliders);
+      window.addEventListener("pointerup", resetSliders);
+      window.addEventListener("touchend", resetSliders);
+    }
+
+    const send = (turn, throttle) => {
+      if (prevTurn !== turn || Math.abs(prevThrottle - throttle) >= 3 || (throttle === 0 && prevThrottle !== 0)) {
+        let buffer = new ArrayBuffer(3);
+        let array = new Uint8Array(buffer);
+
+        array[0] = 0;
+        array[1] = throttle & ((1 << 8) - 1);
+        array[2] = (turn + 1) & ((1 << 8) - 1);
+
+        ws.send(buffer);
+        prevTurn = turn;
+        prevThrottle = throttle;
+      }
+    }
+
+    const resetSliders = () => {
+      vSlider.value = '50';
+      hSlider.value = '0';
+
+      onInput(event);
+    }
+
+    const onInput = () => {
+      const throttle = Number(vSlider.value);
+      const turn = Number(hSlider.value);
+
+      throttleText.innerText = (throttle - 50) * 2;
+      turnText.innerText = turn;
+
+      send(turn, throttle);
+    }
+  </script>
+</head>
+
+<body>
+  <div>
+    <h1 style="text-align: center">SCYLLA </h1>
+    <p style="text-align: center;">
+      THROTTLE: <span id="throttle">0</span>
+      <br>
+      TURN: <span id="turn">0</span>
+      <br>
+    </p>
+  </div>
+
+  <div class="sliders">
+    <div class="slider-container">
+      <input type="range" min="0" max="100" value="50" class="slider v-slider" id="v-slider">
+    </div>
+    <div class="slider-container">
+      <input type="range" min="-1" max="1" value="0" class="slider h-slider" id="h-slider">
+    </div>
+  </div>
+
+</body>
+
+</html>
