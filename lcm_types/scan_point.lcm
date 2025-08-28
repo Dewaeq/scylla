@@ -1,0 +1,4 @@
+struct ScanPoint {
+  float angle;
+  float distance;
+}

@@ -1,0 +1,11 @@
+clang
+
+%cpp -std=c++17
+
+-I./external/rplidar_sdk/sdk/include/
+-I./include
+
+-Wall
+-Wextra
+-Wno-unused-variable
+
