@@ -77,7 +77,7 @@ int main() {
 
     std::cout << "read " << count << " points" << std::endl;
 
-    LaserScan msg;
+    messages::LaserScan msg;
     msg.timestamp = now_ns();
     msg.num_points = count;
     msg.points.resize(count);

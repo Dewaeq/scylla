@@ -1,3 +1,5 @@
+package messages;
+
 struct LaserScan {
   int64_t timestamp;
   int32_t num_points;

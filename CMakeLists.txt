@@ -15,7 +15,7 @@ pkg_check_modules(LCM REQUIRED lcm)
 # generate c++ types from lcm files
 file(GLOB LCM_FILES ${CMAKE_SOURCE_DIR}/lcm_types/*.lcm)
 execute_process(
-  COMMAND lcm-gen -x ${LCM_FILES} --cpp-hpath ${CMAKE_SOURCE_DIR}/include/messages
+  COMMAND lcm-gen -px ${LCM_FILES} --cpp-hpath ${CMAKE_SOURCE_DIR}/include --ppath ${CMAKE_SOURCE_DIR}/python/
 )
 
 include_directories(${LCM_INCLUDE_DIRS})
