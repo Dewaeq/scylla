@@ -3,4 +3,5 @@ package messages;
 struct ScanPoint {
   float angle;
   float distance;
+  int8_t sender_id;
 }

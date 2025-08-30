@@ -20,6 +20,8 @@ class ScanPoint
 
         float      distance;
 
+        int8_t     sender_id;
+
     public:
         /**
          * Encode a message into binary form.
@@ -122,6 +124,9 @@ int ScanPoint::_encodeNoHash(void *buf, int offset, int maxlen) const
     tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->distance, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
+    tlen = __int8_t_encode_array(buf, offset + pos, maxlen - pos, &this->sender_id, 1);
+    if(tlen < 0) return tlen; else pos += tlen;
+
     return pos;
 }
 
@@ -135,6 +140,9 @@ int ScanPoint::_decodeNoHash(const void *buf, int offset, int maxlen)
     tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->distance, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
+    tlen = __int8_t_decode_array(buf, offset + pos, maxlen - pos, &this->sender_id, 1);
+    if(tlen < 0) return tlen; else pos += tlen;
+
     return pos;
 }
 
@@ -143,12 +151,13 @@ int ScanPoint::_getEncodedSizeNoHash() const
     int enc_size = 0;
     enc_size += __float_encoded_array_size(NULL, 1);
     enc_size += __float_encoded_array_size(NULL, 1);
+    enc_size += __int8_t_encoded_array_size(NULL, 1);
     return enc_size;
 }
 
 uint64_t ScanPoint::_computeHash(const __lcm_hash_ptr *)
 {
-    uint64_t hash = 0x3dfce05820a58a42LL;
+    uint64_t hash = 0xb1e523297dac567bLL;
     return (hash<<1) + ((hash>>63)&1);
 }
 

@@ -4,4 +4,5 @@ struct LaserScan {
   int64_t timestamp;
   int32_t num_points;
   ScanPoint points[num_points];
+  int8_t sender_id;
 }

@@ -9,17 +9,19 @@ import struct
 
 class ScanPoint(object):
 
-    __slots__ = ["angle", "distance"]
+    __slots__ = ["angle", "distance", "sender_id"]
 
-    __typenames__ = ["float", "float"]
+    __typenames__ = ["float", "float", "int8_t"]
 
-    __dimensions__ = [None, None]
+    __dimensions__ = [None, None, None]
 
     def __init__(self):
         self.angle = 0.0
         """ LCM Type: float """
         self.distance = 0.0
         """ LCM Type: float """
+        self.sender_id = 0
+        """ LCM Type: int8_t """
 
     def encode(self):
         buf = BytesIO()
@@ -28,7 +30,7 @@ class ScanPoint(object):
         return buf.getvalue()
 
     def _encode_one(self, buf):
-        buf.write(struct.pack(">ff", self.angle, self.distance))
+        buf.write(struct.pack(">ffb", self.angle, self.distance, self.sender_id))
 
     @staticmethod
     def decode(data: bytes):
@@ -43,13 +45,13 @@ class ScanPoint(object):
     @staticmethod
     def _decode_one(buf):
         self = ScanPoint()
-        self.angle, self.distance = struct.unpack(">ff", buf.read(8))
+        self.angle, self.distance, self.sender_id = struct.unpack(">ffb", buf.read(9))
         return self
 
     @staticmethod
     def _get_hash_recursive(parents):
         if ScanPoint in parents: return 0
-        tmphash = (0x3dfce05820a58a42) & 0xffffffffffffffff
+        tmphash = (0xb1e523297dac567b) & 0xffffffffffffffff
         tmphash  = (((tmphash<<1)&0xffffffffffffffff) + (tmphash>>63)) & 0xffffffffffffffff
         return tmphash
     _packed_fingerprint = None

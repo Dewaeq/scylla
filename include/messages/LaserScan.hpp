@@ -27,6 +27,8 @@ class LaserScan
          */
         std::vector< messages::ScanPoint > points;
 
+        int8_t     sender_id;
+
     public:
         /**
          * Encode a message into binary form.
@@ -134,6 +136,9 @@ int LaserScan::_encodeNoHash(void *buf, int offset, int maxlen) const
         if(tlen < 0) return tlen; else pos += tlen;
     }
 
+    tlen = __int8_t_encode_array(buf, offset + pos, maxlen - pos, &this->sender_id, 1);
+    if(tlen < 0) return tlen; else pos += tlen;
+
     return pos;
 }
 
@@ -157,6 +162,9 @@ int LaserScan::_decodeNoHash(const void *buf, int offset, int maxlen)
         if(tlen < 0) return tlen; else pos += tlen;
     }
 
+    tlen = __int8_t_decode_array(buf, offset + pos, maxlen - pos, &this->sender_id, 1);
+    if(tlen < 0) return tlen; else pos += tlen;
+
     return pos;
 }
 
@@ -168,6 +176,7 @@ int LaserScan::_getEncodedSizeNoHash() const
     for (int a0 = 0; a0 < this->num_points; a0++) {
         enc_size += this->points[a0]._getEncodedSizeNoHash();
     }
+    enc_size += __int8_t_encoded_array_size(NULL, 1);
     return enc_size;
 }
 
@@ -179,7 +188,7 @@ uint64_t LaserScan::_computeHash(const __lcm_hash_ptr *p)
             return 0;
     const __lcm_hash_ptr cp = { p, LaserScan::getHash };
 
-    uint64_t hash = 0xec2742130c98cc76LL +
+    uint64_t hash = 0xda408bb97abbc3a5LL +
          messages::ScanPoint::_computeHash(&cp);
 
     return (hash<<1) + ((hash>>63)&1);

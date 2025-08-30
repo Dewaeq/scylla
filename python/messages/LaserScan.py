@@ -11,11 +11,11 @@ import messages
 
 class LaserScan(object):
 
-    __slots__ = ["timestamp", "num_points", "points"]
+    __slots__ = ["timestamp", "num_points", "points", "sender_id"]
 
-    __typenames__ = ["int64_t", "int32_t", "messages.ScanPoint"]
+    __typenames__ = ["int64_t", "int32_t", "messages.ScanPoint", "int8_t"]
 
-    __dimensions__ = [None, None, ["num_points"]]
+    __dimensions__ = [None, None, ["num_points"], None]
 
     def __init__(self):
         self.timestamp = 0
@@ -24,6 +24,8 @@ class LaserScan(object):
         """ LCM Type: int32_t """
         self.points = []
         """ LCM Type: messages.ScanPoint[num_points] """
+        self.sender_id = 0
+        """ LCM Type: int8_t """
 
     def encode(self):
         buf = BytesIO()
@@ -36,6 +38,7 @@ class LaserScan(object):
         for i0 in range(self.num_points):
             assert self.points[i0]._get_packed_fingerprint() == messages.ScanPoint._get_packed_fingerprint()
             self.points[i0]._encode_one(buf)
+        buf.write(struct.pack(">b", self.sender_id))
 
     @staticmethod
     def decode(data: bytes):
@@ -54,13 +57,14 @@ class LaserScan(object):
         self.points = []
         for i0 in range(self.num_points):
             self.points.append(messages.ScanPoint._decode_one(buf))
+        self.sender_id = struct.unpack(">b", buf.read(1))[0]
         return self
 
     @staticmethod
     def _get_hash_recursive(parents):
         if LaserScan in parents: return 0
         newparents = parents + [LaserScan]
-        tmphash = (0xec2742130c98cc76+ messages.ScanPoint._get_hash_recursive(newparents)) & 0xffffffffffffffff
+        tmphash = (0xda408bb97abbc3a5+ messages.ScanPoint._get_hash_recursive(newparents)) & 0xffffffffffffffff
         tmphash  = (((tmphash<<1)&0xffffffffffffffff) + (tmphash>>63)) & 0xffffffffffffffff
         return tmphash
     _packed_fingerprint = None
