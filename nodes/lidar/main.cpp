@@ -9,6 +9,9 @@
 #include "sl_lidar.h"
 #include "sl_lidar_driver.h"
 
+#define MIN_DIST 8
+#define MAX_DIST 10000
+
 using namespace sl;
 
 int64_t now_ns() {
@@ -75,20 +78,27 @@ int main() {
       return -1;
     }
 
-    std::cout << "read " << count << " points" << std::endl;
-
     messages::LaserScan msg;
     msg.timestamp = now_ns();
-    msg.num_points = count;
-    msg.points.resize(count);
 
     lidar->ascendScanData(nodes, count);
     for (int i = 0; i < count; i++) {
-      msg.points[i].angle = nodes[i].angle_z_q14 * 90.0f / 16384.0f;
-      msg.points[i].distance = nodes[i].dist_mm_q2 / 4.0f;
+      const auto &node = nodes[i];
+      float dist = node.dist_mm_q2 / 4.0f;
+      if (dist < MIN_DIST || dist > MAX_DIST)
+        continue;
+
+      messages::ScanPoint point;
+      point.distance = dist;
+      point.angle = node.angle_z_q14 * 90.0f / 16384.0f;
+      msg.points.push_back(point);
     }
 
-    lcm.publish("scans", &msg);
+    msg.num_points = msg.points.size();
+
+    printf("filtered out %d points\n", count - msg.num_points);
+
+    lcm.publish("laser_scan", &msg);
   }
 
   lidar->setMotorSpeed(0);

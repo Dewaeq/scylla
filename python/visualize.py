@@ -47,8 +47,6 @@ def loop():
     pygame.draw.circle(display, (255, 255, 255), (SIZE/2, SIZE/2), 5)
     pygame.display.update()
 
-    print(f"min_dist={min_dist}")
-    print(f"max_dist={max_dist}")
 
 def handler(channel, data):
     global msg
@@ -56,7 +54,7 @@ def handler(channel, data):
 
 
 lc = lcm.LCM()
-sub = lc.subscribe("scans", handler)
+sub = lc.subscribe("laser_scan", handler)
 
 
 try:
