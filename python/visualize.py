@@ -8,8 +8,9 @@ from messages import ScanPoint
 from messages import SteerCommand
 
 
-SIZE = 600
-display = pygame.display.set_mode((600, 600))
+pygame.init()
+SIZE = pygame.display.Info().current_h * 0.9
+display = pygame.display.set_mode((SIZE, SIZE))
 
 msg: LaserScan | None = None
 last_cmd = SteerCommand()
@@ -18,7 +19,7 @@ def draw():
     if msg == None:
         return
 
-    max_dist = 12
+    max_dist = 10000
     points: List[ScanPoint] = []
 
     for point in msg.points:
