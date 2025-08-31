@@ -40,6 +40,7 @@ add_library(rplidar_sdk ${RPLIDAR_SDK_SRC})
 
 # define modules
 add_subdirectory(${CMAKE_SOURCE_DIR}/nodes/lidar)
+add_subdirectory(${CMAKE_SOURCE_DIR}/nodes/test)
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
   add_subdirectory(${CMAKE_SOURCE_DIR}/nodes/control)

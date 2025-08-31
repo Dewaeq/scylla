@@ -16,6 +16,8 @@ class Handler {
 public:
   void handleMessage(const lcm::ReceiveBuffer *rbuf, const std::string &chan,
                      const messages::SteerCommand *msg) {
+    std::cout << "[INFO] got steer command" << std::endl;
+
     if (msg->speed < -255 || msg->speed > 255) {
       std::cout << "[WARNING] SteerCommand::speed is out of range: "
                 << msg->speed << std::endl;
@@ -61,6 +63,8 @@ int main() {
   pinMode(MOTOR_2, OUTPUT);
   pinMode(STEER_1, OUTPUT);
   pinMode(STEER_2, OUTPUT);
+
+  std::cout << "setup pin modes complete" << std::endl;
 
   lcm::LCM lcm;
   if (!lcm.good()) {
