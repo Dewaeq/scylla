@@ -64,6 +64,8 @@ int main() {
   pinMode(STEER_1, OUTPUT);
   pinMode(STEER_2, OUTPUT);
 
+  pwmSetRange(255);
+
   std::cout << "setup pin modes complete" << std::endl;
 
   lcm::LCM lcm;

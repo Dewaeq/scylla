@@ -3,8 +3,8 @@ import lcm
 import pygame
 from math import inf, radians, cos, sin
 
-from messages.LaserScan import LaserScan
-from messages.ScanPoint import ScanPoint
+from messages import LaserScan
+from messages import ScanPoint
 from messages import SteerCommand
 
 
@@ -18,15 +18,12 @@ def draw():
     if msg == None:
         return
 
-    max_dist = 0
-    min_dist = inf
+    max_dist = 12
     points: List[ScanPoint] = []
 
     for point in msg.points:
         if point.distance == 0:
             continue
-        max_dist = max(max_dist, point.distance)
-        min_dist = min(min_dist, point.distance)
         points.append(point)
 
     display.fill((0, 0, 0))
