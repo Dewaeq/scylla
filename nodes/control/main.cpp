@@ -32,6 +32,8 @@ public:
     digitalWrite(MOTOR_2, !forward);
     pwmWrite(MOTOR_SPEED, abs(msg->speed));
 
+    std::cout << "[INFO] applying steer command" << std::endl;
+
     switch (msg->turn) {
     case -1:
     case 1:
