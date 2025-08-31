@@ -6,3 +6,4 @@ lcm-gen 1.5.1
 
 from .LaserScan import LaserScan as LaserScan
 from .ScanPoint import ScanPoint as ScanPoint
+from .SteerCommand import SteerCommand as SteerCommand

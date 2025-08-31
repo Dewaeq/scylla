@@ -1,0 +1,12 @@
+package messages;
+
+struct SteerCommand {
+  // Signed speed:
+  // -255 means full throttle backwards
+  // 255 means full throttle forwards
+  int32_t speed;
+  // -1 means left
+  // 0 means forward
+  // 1 means right
+  int8_t turn;
+}

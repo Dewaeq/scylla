@@ -40,3 +40,9 @@ add_library(rplidar_sdk ${RPLIDAR_SDK_SRC})
 
 # define modules
 add_subdirectory(${CMAKE_SOURCE_DIR}/nodes/lidar)
+
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+  add_subdirectory(${CMAKE_SOURCE_DIR}/nodes/control)
+else()
+  message(STATUS "skipping control node (not building for rpi)")
+endif()

@@ -4,6 +4,7 @@ clang
 
 -I./external/rplidar_sdk/sdk/include/
 -I./include
+-I../temp/wiringpi/include/
 
 -Wall
 -Wextra
