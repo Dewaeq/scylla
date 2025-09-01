@@ -16,9 +16,9 @@ namespace messages
 class ScanPoint
 {
     public:
-        float      angle;
+        float      x;
 
-        float      distance;
+        float      y;
 
     public:
         /**
@@ -116,10 +116,10 @@ int ScanPoint::_encodeNoHash(void *buf, int offset, int maxlen) const
 {
     int pos = 0, tlen;
 
-    tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->angle, 1);
+    tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->x, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
-    tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->distance, 1);
+    tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->y, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
     return pos;
@@ -129,10 +129,10 @@ int ScanPoint::_decodeNoHash(const void *buf, int offset, int maxlen)
 {
     int pos = 0, tlen;
 
-    tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->angle, 1);
+    tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->x, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
-    tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->distance, 1);
+    tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->y, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
     return pos;
@@ -148,7 +148,7 @@ int ScanPoint::_getEncodedSizeNoHash() const
 
 uint64_t ScanPoint::_computeHash(const __lcm_hash_ptr *)
 {
-    uint64_t hash = 0x3dfce05820a58a42LL;
+    uint64_t hash = 0x7c2d87baacd686e3LL;
     return (hash<<1) + ((hash>>63)&1);
 }
 

@@ -1,6 +1,6 @@
 package messages;
 
 struct ScanPoint {
-  float angle;
-  float distance;
+  float x;
+  float y;
 }

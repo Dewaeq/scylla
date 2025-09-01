@@ -1,16 +1,17 @@
 #include <chrono>
+#include <cmath>
 #include <iostream>
 #include <lcm/lcm-cpp.hpp>
+#include <numbers>
 #include <unistd.h>
 #include <vector>
 
+#include "lidar.hpp"
 #include "messages/LaserScan.hpp"
 #include "rplidar.h"
+#include "scan_filter.hpp"
 #include "sl_lidar.h"
 #include "sl_lidar_driver.h"
-
-#define MIN_DIST 8
-#define MAX_DIST 10000
 
 using namespace sl;
 
@@ -21,21 +22,23 @@ int64_t now_ns() {
 }
 
 int main() {
-  auto channel = createSerialPortChannel("/dev/ttyUSB0", 115200);
+  ScanFilter scan_filter;
+
+  const auto channel = createSerialPortChannel("/dev/ttyUSB0", 115200);
   if (SL_IS_FAIL(channel.err))
     exit(-1);
 
-  auto driver = createLidarDriver();
+  const auto driver = createLidarDriver();
   if (!driver)
     exit(-1);
 
-  ILidarDriver *lidar = driver.value;
+  ILidarDriver *const lidar = driver.value;
 
-  auto res = lidar->connect(channel.value);
+  const auto res = lidar->connect(channel.value);
 
   if (SL_IS_OK(res)) {
     sl_lidar_response_device_info_t deviceInfo;
-    res = lidar->getDeviceInfo(deviceInfo);
+    const auto res = lidar->getDeviceInfo(deviceInfo);
     if (SL_IS_OK(res)) {
       printf("Model: %d, Firmware Version: %d.%d, Hardware Version: %d\n",
              deviceInfo.model, deviceInfo.firmware_version >> 8,
@@ -84,27 +87,31 @@ int main() {
     lidar->ascendScanData(nodes, count);
     for (int i = 0; i < count; i++) {
       const auto &node = nodes[i];
-      float dist = node.dist_mm_q2 / 4.0f;
-      if (dist < MIN_DIST || dist > MAX_DIST)
-        continue;
+      const float dist = node.dist_mm_q2 / 4.0f;
+      const float deg = node.angle_z_q14 * 90. / 16384.;
+      const float rad = deg * std::numbers::pi / 180.;
 
       messages::ScanPoint point;
-      point.distance = dist;
-      point.angle = node.angle_z_q14 * 90.0f / 16384.0f;
+      point.x = dist * std::cos(rad);
+      point.y = dist * std::sin(rad);
       msg.points.push_back(point);
     }
-
     msg.num_points = msg.points.size();
-
-    printf("filtered out %d points\n", count - msg.num_points);
+    const auto old_count = msg.num_points;
 
     lcm.publish("laser_scan", &msg);
+
+    scan_filter.filter(msg);
+    const auto new_count = msg.num_points;
+
+    std::cout << "[INFO] filtered out " << old_count - new_count
+              << " points from " << old_count << std::endl;
+
+    lcm.publish("filtered_scan", &msg);
   }
 
   lidar->setMotorSpeed(0);
   lidar->stop();
-
-  sleep(5);
 
   return 0;
 }

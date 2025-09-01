@@ -2,7 +2,7 @@
 
 ## Roadmap
 - [x] Read lidar data
-- [ ] Preprocess data (e.g. range cutoff)
+- [x] Preprocess data (e.g. range cutoff and voxel filter)
 - [ ] Create controller
 - [ ] Odometry
 - [ ] Simple local map (occupancy grid)

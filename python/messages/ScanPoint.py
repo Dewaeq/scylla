@@ -9,16 +9,16 @@ import struct
 
 class ScanPoint(object):
 
-    __slots__ = ["angle", "distance"]
+    __slots__ = ["x", "y"]
 
     __typenames__ = ["float", "float"]
 
     __dimensions__ = [None, None]
 
     def __init__(self):
-        self.angle = 0.0
+        self.x = 0.0
         """ LCM Type: float """
-        self.distance = 0.0
+        self.y = 0.0
         """ LCM Type: float """
 
     def encode(self):
@@ -28,7 +28,7 @@ class ScanPoint(object):
         return buf.getvalue()
 
     def _encode_one(self, buf):
-        buf.write(struct.pack(">ff", self.angle, self.distance))
+        buf.write(struct.pack(">ff", self.x, self.y))
 
     @staticmethod
     def decode(data: bytes):
@@ -43,13 +43,13 @@ class ScanPoint(object):
     @staticmethod
     def _decode_one(buf):
         self = ScanPoint()
-        self.angle, self.distance = struct.unpack(">ff", buf.read(8))
+        self.x, self.y = struct.unpack(">ff", buf.read(8))
         return self
 
     @staticmethod
     def _get_hash_recursive(parents):
         if ScanPoint in parents: return 0
-        tmphash = (0x3dfce05820a58a42) & 0xffffffffffffffff
+        tmphash = (0x7c2d87baacd686e3) & 0xffffffffffffffff
         tmphash  = (((tmphash<<1)&0xffffffffffffffff) + (tmphash>>63)) & 0xffffffffffffffff
         return tmphash
     _packed_fingerprint = None

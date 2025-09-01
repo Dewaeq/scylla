@@ -1,39 +1,41 @@
 from typing import List
 import lcm
 import pygame
-from math import inf, radians, cos, sin
 
 from messages import LaserScan
-from messages import ScanPoint
 from messages import SteerCommand
 
-
 pygame.init()
+lc = lcm.LCM()
+
 SIZE = pygame.display.Info().current_h * 0.9
 display = pygame.display.set_mode((SIZE, SIZE))
 
 msg: LaserScan | None = None
 last_cmd = SteerCommand()
+sub: lcm.LCMSubscription | None = None
+
+show_filtered = False
+
+def subscribe():
+    global sub
+
+    if sub:
+        lc.unsubscribe(sub)
+    sub = lc.subscribe("filtered_scan" if show_filtered else "laser_scan", handler)
+
 
 def draw():
     if msg == None:
         return
 
     max_dist = 10000
-    points: List[ScanPoint] = []
-
-    for point in msg.points:
-        if point.distance == 0:
-            continue
-        points.append(point)
 
     display.fill((0, 0, 0))
 
-    for point in points:
-        d = point.distance / max_dist * SIZE / 2
-        z = radians(point.angle)
-        x = d * cos(z) + SIZE / 2
-        y = d * sin(z) + SIZE / 2
+    for point in msg.points:
+        x = (point.x / max_dist + 1) * SIZE / 2
+        y = (point.y / max_dist + 1) * SIZE / 2
 
         pygame.draw.circle(display, (255, 0, 255), (x, y), 2)
 
@@ -61,10 +63,15 @@ def steer():
 
 
 def loop():
+    global show_filtered
+
     # lc.handle()
     lc.handle_timeout(5)
 
     for event in pygame.event.get():
+        if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+            show_filtered = not show_filtered
+            subscribe()
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
@@ -73,17 +80,13 @@ def loop():
     steer()
 
 
-
 def handler(channel, data):
     global msg
     msg = LaserScan.decode(data)
 
 
-lc = lcm.LCM()
-sub = lc.subscribe("laser_scan", handler)
-
-
 try:
+    subscribe()
     while True:
         loop()
 except Exception as ex:

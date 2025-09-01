@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(scylla LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+message(${CMAKE_SOURCE_DIR})
+
+set(CMAKE_CXX_STANDARD 20)
 
 # set output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -42,7 +44,6 @@ add_library(rplidar_sdk ${RPLIDAR_SDK_SRC})
 
 # define modules
 add_subdirectory(${CMAKE_SOURCE_DIR}/nodes/lidar)
-add_subdirectory(${CMAKE_SOURCE_DIR}/nodes/test)
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
   add_subdirectory(${CMAKE_SOURCE_DIR}/nodes/control)
