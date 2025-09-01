@@ -1,4 +1,3 @@
-from typing import List
 import lcm
 import pygame
 
@@ -8,8 +7,13 @@ from messages import SteerCommand
 pygame.init()
 lc = lcm.LCM()
 
+MAX_DIST = 10000
 SIZE = pygame.display.Info().current_h * 0.9
-display = pygame.display.set_mode((SIZE, SIZE))
+CENTER = (SIZE/2, SIZE/2)
+
+screen = pygame.display.set_mode((SIZE, SIZE))
+display = pygame.surface.Surface((SIZE, SIZE), pygame.SRCALPHA)
+font = pygame.font.SysFont(name=None, size=42)
 
 msg: LaserScan | None = None
 last_cmd = SteerCommand()
@@ -25,22 +29,34 @@ def subscribe():
     sub = lc.subscribe("filtered_scan" if show_filtered else "laser_scan", handler)
 
 
+def draw_circle(radius_mm: int):
+    pygame.draw.circle(display, (255, 255, 255, 90), CENTER, radius_mm / MAX_DIST * SIZE / 2, 1)
+
 def draw():
     if msg == None:
         return
 
-    max_dist = 10000
-
+    screen.fill((0, 0, 0))
     display.fill((0, 0, 0))
 
+    text = font.render(f"{msg.num_points} points", True, (255, 255, 255))
+    display.blit(text, (0, 0))
+
     for point in msg.points:
-        x = (point.x / max_dist + 1) * SIZE / 2
-        y = (point.y / max_dist + 1) * SIZE / 2
+        x = (point.x / MAX_DIST + 1) * SIZE / 2
+        y = SIZE - (point.y / MAX_DIST + 1) * SIZE / 2
 
         pygame.draw.circle(display, (255, 0, 255), (x, y), 2)
 
-    pygame.draw.circle(display, (255, 255, 255), (SIZE/2, SIZE/2), 5)
-    pygame.display.update()
+    pygame.draw.circle(display, (255, 255, 255), CENTER, 5)
+    pygame.draw.line(display, (0, 255, 0, 64), CENTER, (SIZE / 2, 0))
+    pygame.draw.line(display, (0, 255, 0, 64), CENTER, (SIZE, SIZE / 2))
+
+    for i in range(10):
+        draw_circle(1000 * i)
+
+    screen.blit(display, (0, 0))
+    pygame.display.flip()
 
 def steer():
     global last_cmd

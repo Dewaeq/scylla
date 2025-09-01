@@ -92,8 +92,8 @@ int main() {
       const float rad = deg * std::numbers::pi / 180.;
 
       messages::ScanPoint point;
-      point.x = dist * std::cos(rad);
-      point.y = dist * std::sin(rad);
+      point.x = dist * std::sin(rad);
+      point.y = dist * std::cos(rad);
       msg.points.push_back(point);
     }
     msg.num_points = msg.points.size();

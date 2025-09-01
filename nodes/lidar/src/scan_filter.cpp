@@ -25,18 +25,13 @@ void ScanFilter::filter(messages::LaserScan &scan) {
     const int y = std::floor(point.y / VOXEL_SIZE);
     const auto key = std::make_pair(x, y);
 
-    const auto it = grid.find(key);
-    if (it == grid.end()) {
-      grid.insert({key, {pos, 1}});
-    } else {
-      grid[key].first += pos;
-      grid[key].second += 1;
-    }
+    grid[key].acc_pos += pos;
+    grid[key].count += 1;
   }
 
   int count = 0;
-  for (const auto &[cell, data] : grid) {
-    const Vector2f avg = data.first / (float)data.second;
+  for (const auto &[cell, stats] : grid) {
+    const Vector2f avg = stats.avg_pos();
     scan.points[count].x = avg.x();
     scan.points[count].y = avg.y();
     count++;
