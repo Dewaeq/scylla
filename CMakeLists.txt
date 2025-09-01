@@ -8,8 +8,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-# configure lcm
 find_package(PkgConfig REQUIRED)
+find_package(Eigen3 3.4 REQUIRED NO_MODULE)
+
+# configure lcm
 pkg_check_modules(LCM REQUIRED lcm)
 
 # generate c++ types from lcm files

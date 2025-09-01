@@ -5,6 +5,7 @@ clang
 -I./external/rplidar_sdk/sdk/include/
 -I./include
 -I../temp/wiringpi/include/
+-I/usr/include/eigen3/
 
 -Wall
 -Wextra
