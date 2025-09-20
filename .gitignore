@@ -5,3 +5,4 @@ venv/
 include/messages/
 python/messages/
 compile_commands.json
+scans/

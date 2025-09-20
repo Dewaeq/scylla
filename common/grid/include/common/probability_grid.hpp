@@ -11,8 +11,6 @@ public:
 
   void update(const Eigen::Isometry2f &robot_transform,
               const std::vector<Eigen::Vector2f> &observations);
-  float at(int x, int y) const;
-  Eigen::Vector2i world_to_cell(const Eigen::Vector2f world_pos);
   void save_as_pgm(const std::string &file_name);
 
 private:
@@ -25,6 +23,9 @@ private:
   // position in the world frame
   Eigen::Isometry2f grid_trans;
 
+  float at(int x, int y) const;
+  bool in_bounds(const Eigen::Vector2i &cell) const;
+  Eigen::Vector2i world_to_cell(const Eigen::Vector2f world_pos);
   std::vector<Eigen::Vector2i> get_ray_cells(const Eigen::Vector2i &cell0,
                                              const Eigen::Vector2i &cell1);
 };

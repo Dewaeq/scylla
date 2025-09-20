@@ -1,4 +1,4 @@
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 #include <iostream>
 #include <lcm/lcm-cpp.hpp>
 #include <sstream>
@@ -34,7 +34,7 @@ public:
 int main(int argc, char *argv[]) {
   std::cout << "hi there" << std::endl;
 
-  ProbabilityGrid grid(60, 60, 100, Eigen::Isometry2f::Identity());
+  ProbabilityGrid grid(400, 400, 20, Eigen::Isometry2f::Identity());
 
   lcm::LCM lcm;
   if (!lcm.good())

@@ -1,7 +1,7 @@
 #ifndef SCAN_FILTER_H
 #define SCAN_FILTER_H
 
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 #include <map>
 
 #include "messages/LaserScan.hpp"

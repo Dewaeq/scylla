@@ -1,6 +1,7 @@
-#include "common/probability_grid.hpp"
 #include <algorithm>
 #include <fstream>
+
+#include "common/probability_grid.hpp"
 
 using namespace Eigen;
 
@@ -21,6 +22,7 @@ void ProbabilityGrid::update(const Isometry2f &robot_transform,
     Vector2f obs_world = robot_transform * obs;
     Vector2i obs_cell = world_to_cell(obs_world);
     auto cells = get_ray_cells(robot_cell, obs_cell);
+
     for (int i = 0; i < cells.size() - 1; i++) {
       auto cell = cells[i];
       grid[cell.y() * width + cell.x()] -= 0.4;
@@ -33,8 +35,12 @@ void ProbabilityGrid::update(const Isometry2f &robot_transform,
 
 float ProbabilityGrid::at(int x, int y) const { return grid[y * width + x]; }
 
-Eigen::Vector2i
-ProbabilityGrid::world_to_cell(const Eigen::Vector2f world_pos) {
+bool ProbabilityGrid::in_bounds(const Vector2i &cell) const {
+  return cell.x() >= 0 && cell.x() < width && cell.y() >= 0 &&
+         cell.y() < height;
+}
+
+Vector2i ProbabilityGrid::world_to_cell(const Vector2f world_pos) {
   return (grid_trans.inverse() * world_pos / resolution - origin).cast<int>();
 }
 
@@ -46,7 +52,7 @@ std::vector<Vector2i> ProbabilityGrid::get_ray_cells(const Vector2i &cell0,
   Vector2i diff = cell1 - cell0;
 
   int dx = std::abs(diff.x());
-  int dy = std::abs(diff.y());
+  int dy = -std::abs(diff.y());
   int sx = diff.x() > 0 ? 1 : -1;
   int sy = diff.y() > 0 ? 1 : -1;
   int err = dx + dy;
