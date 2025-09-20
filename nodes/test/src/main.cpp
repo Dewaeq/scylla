@@ -20,13 +20,13 @@ public:
 
     grid.update(Eigen::Isometry2f::Identity(), observations);
 
-    std::stringstream sstream;
-    sstream << "scans/" << "scan_" << msg->timestamp << ".pgm";
-    std::string file_name = sstream.str();
-
-    std::cout << "[INFO] storing map to: " << file_name << std::endl;
-
-    grid.save_as_pgm(file_name);
+    // std::stringstream sstream;
+    // sstream << "scans/" << "scan_" << msg->timestamp << ".pgm";
+    // std::string file_name = sstream.str();
+    //
+    // std::cout << "[INFO] storing map to: " << file_name << std::endl;
+    //
+    // grid.save_as_pgm(file_name);
   }
   ProbabilityGrid &grid;
 };
