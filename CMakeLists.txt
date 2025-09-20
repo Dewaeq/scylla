@@ -10,6 +10,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 find_package(PkgConfig REQUIRED)
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
+find_package(Ceres REQUIRED)
 
 # configure lcm
 pkg_check_modules(LCM REQUIRED lcm)
