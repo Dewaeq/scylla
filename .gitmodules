@@ -1,3 +1,6 @@
 [submodule "external/rplidar_sdk"]
 	path = external/rplidar_sdk
 	url = https://github.com/Slamtec/rplidar_sdk.git
+[submodule "external/kdtree"]
+	path = external/kdtree
+	url = https://github.com/crvs/KDTree.git

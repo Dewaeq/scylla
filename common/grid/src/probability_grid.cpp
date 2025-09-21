@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <eigen3/Eigen/Dense>
 #include <fstream>
 
 #include "common/probability_grid.hpp"
@@ -24,12 +25,16 @@ void ProbabilityGrid::update(const Isometry2f &robot_transform,
     auto cells = get_ray_cells(robot_cell, obs_cell);
 
     for (int i = 0; i < cells.size() - 1; i++) {
-      auto cell = cells[i];
-      grid[cell.y() * width + cell.x()] -= 0.4;
+      add(cells[i], -0.4);
     }
 
-    auto cell = cells.back();
-    grid[cell.y() * width + cell.x()] += 0.85;
+    add(cells.back(), 0.85);
+  }
+}
+
+void ProbabilityGrid::add(const Vector2i &cell, float val) {
+  if (in_bounds(cell)) {
+    grid[cell.y() * width + cell.x()] += val;
   }
 }
 

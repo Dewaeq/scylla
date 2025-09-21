@@ -24,6 +24,7 @@ private:
   Eigen::Isometry2f grid_trans;
 
   float at(int x, int y) const;
+  void add(const Eigen::Vector2i &cell, float val);
   bool in_bounds(const Eigen::Vector2i &cell) const;
   Eigen::Vector2i world_to_cell(const Eigen::Vector2f world_pos);
   std::vector<Eigen::Vector2i> get_ray_cells(const Eigen::Vector2i &cell0,

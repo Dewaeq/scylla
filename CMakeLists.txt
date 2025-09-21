@@ -41,6 +41,8 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 add_library(rplidar_sdk ${RPLIDAR_SDK_SRC})
 
+add_subdirectory(external/kdtree)
+
 # define modules
 add_subdirectory(${CMAKE_SOURCE_DIR}/common)
 add_subdirectory(${CMAKE_SOURCE_DIR}/nodes)
