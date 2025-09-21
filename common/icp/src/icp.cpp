@@ -1,8 +1,7 @@
 #include <KDTree.hpp>
 #include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/src/Core/Matrix.h>
-#include <eigen3/Eigen/src/Core/util/Constants.h>
-#include <eigen3/Eigen/src/Geometry/Transform.h>
+#include <glog/logging.h>
+#include <vector>
 
 #include "common/icp.hpp"
 
@@ -10,13 +9,13 @@ using namespace Eigen;
 
 namespace icp {
 Eigen::Isometry2f align_scans(const Scan &reference_points,
-                              const Scan &current_scan,
-                              Isometry2f initial_estimate, int max_iterations) {
-  Isometry2f current_pose = initial_estimate;
+                              const Scan &current_scan, Pose initial_estimate,
+                              int max_iterations) {
+  Pose current_pose = initial_estimate;
 
   pointVec tree_points;
   for (const auto &pt : reference_points) {
-    tree_points.emplace_back(pt.x(), pt.y());
+    tree_points.push_back(std::vector<double>({pt.x(), pt.y()}));
   }
 
   KDTree tree(tree_points);
@@ -26,7 +25,7 @@ Eigen::Isometry2f align_scans(const Scan &reference_points,
   for (int i = 0; i < max_iterations; i++) {
     for (const auto &pt : current_scan) {
       Point transformed = current_pose * pt;
-      point_t tree_point(transformed.x(), transformed.y());
+      point_t tree_point({transformed.x(), transformed.y()});
       point_t reference_point_t = tree.nearest_point(tree_point);
       Point reference_point(reference_point_t[0], reference_point_t[1]);
       associations.push_back({reference_point, transformed});
@@ -43,7 +42,6 @@ Eigen::Isometry2f align_scans(const Scan &reference_points,
 }
 
 Isometry2f calculate_svd_transform(std::vector<std::pair<Point, Point>> pairs) {
-
   Point ref_centroid = Point::Zero();
   Point scan_centroid = Point::Zero();
 

@@ -11,6 +11,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 find_package(PkgConfig REQUIRED)
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 find_package(Ceres REQUIRED)
+find_package(glog REQUIRED)
 
 # configure lcm
 pkg_check_modules(LCM REQUIRED lcm)
@@ -38,6 +39,8 @@ file(GLOB RPLIDAR_SDK_SRC
 )
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
+
+link_libraries(glog::glog)
 
 add_library(rplidar_sdk ${RPLIDAR_SDK_SRC})
 
