@@ -109,8 +109,6 @@ ProbabilityGrid::get_points_box(const Vector2f &center, float size) {
   std::vector<Vector2f> points;
   Vector2i center_cell = world_to_cell(center);
 
-  int x = center_cell.x() - size / (2 * resolution);
-
   int x_start = std::max(0, (int)(center_cell.x() - size / 2 / resolution));
   int x_end =
       std::min(width - 1, (int)(center_cell.x() + size / 2 / resolution));
@@ -118,10 +116,12 @@ ProbabilityGrid::get_points_box(const Vector2f &center, float size) {
   int y_end =
       std::min(height - 1, (int)(center_cell.y() + size / 2 / resolution));
 
-  for (int x = x_start; x < x_end; x++) {
-    for (int y = y_start; y < y_end; y++) {
-      if (grid[y * width + x] > 2.0) {
-        points.emplace_back(resolution * (x + 0.5), resolution * (y + 0.5));
+  for (int x = x_start; x <= x_end; x++) {
+    for (int y = y_start; y <= y_end; y++) {
+      if (at(x, y) > 2.0) {
+        Vector2f local(x + 0.5, y + 0.5);
+        Vector2f global = grid_trans * local * resolution;
+        points.push_back(global);
       }
     }
   }

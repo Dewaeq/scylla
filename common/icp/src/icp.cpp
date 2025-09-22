@@ -7,6 +7,7 @@
 
 using namespace Eigen;
 
+// https://learnopencv.com/iterative-closest-point-icp-explained/
 namespace icp {
 Eigen::Isometry2f align_scans(const Scan &reference_points,
                               const Scan &current_scan, Pose initial_estimate,

@@ -19,7 +19,8 @@ void SlamFrontend::handleScan(const lcm::ReceiveBuffer *rbuf,
   auto t0 = steady_clock::now();
 
   Isometry2f initial_estimate = current_pose;
-  Scan reference_points = submap.get_points_box(Point::Zero(), 10000.0);
+  Scan reference_points =
+      submap.get_points_box(initial_estimate.translation(), 10000.0);
   Scan current_scan;
   current_scan.reserve(msg->num_points);
   for (const auto &pt : msg->points) {
@@ -40,7 +41,7 @@ void SlamFrontend::handleScan(const lcm::ReceiveBuffer *rbuf,
   auto t1 = steady_clock::now();
 
   duration<double> elapsed = t1 - t0;
-  LOG(INFO) << "scan aligment took " << elapsed << " seconds";
+  LOG(INFO) << "scan aligment took " << elapsed.count() << " seconds";
 
   std::stringstream ss;
   ss << "scans/" << msg->timestamp << ".pgm";
