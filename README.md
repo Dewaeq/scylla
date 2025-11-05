@@ -22,3 +22,5 @@
     - [ ] Submap <-> submap edges (loop closure)
     - [ ] Loop closure
 
+![IMG20250826001707](https://github.com/user-attachments/assets/f8900b40-c287-48ae-af7e-b43ed75dfbe4)
+![IMG20250826175657](https://github.com/user-attachments/assets/efdc6d15-8abf-4d0d-a6e1-cf2d23907e97)
