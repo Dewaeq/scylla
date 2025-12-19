@@ -3,6 +3,7 @@
 #include <iostream>
 #include <lcm/lcm-cpp.hpp>
 #include <numbers>
+#include <thread>
 #include <unistd.h>
 #include <vector>
 
@@ -60,6 +61,10 @@ int main() {
     std::cout << "\t" << "max dist: " << scan_mode.max_distance
               << "  us: " << scan_mode.us_per_sample << std::endl;
   }
+
+  lidar->reset();
+  // give it a moment
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
   LidarScanMode scan_mode;
   lidar->startScan(false, true, 0, &scan_mode);
