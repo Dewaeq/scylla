@@ -69,8 +69,10 @@ int main() {
             << "  us: " << scan_mode.us_per_sample << std::endl;
 
   lcm::LCM lcm;
-  if (!lcm.good())
+  if (!lcm.good()) {
+    std::cerr << "failed to init LCM!" << std::endl;
     return -1;
+  }
 
   sl_lidar_response_measurement_node_hq_t nodes[8192];
   size_t count = 8192;
@@ -78,7 +80,9 @@ int main() {
   while (1) {
     auto result = lidar->grabScanDataHq(nodes, count);
     if (SL_IS_FAIL(result) || result == SL_RESULT_OPERATION_TIMEOUT) {
-      return -1;
+      std::cerr << "failed read lidar" << std::endl;
+      sleep(1);
+      continue;
     }
 
     messages::LaserScan msg;
