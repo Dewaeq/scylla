@@ -10,7 +10,8 @@ using namespace Eigen;
 using namespace std::chrono;
 
 SlamFrontend::SlamFrontend() : current_pose(Isometry2f::Identity()) {
-  submap = ProbabilityGrid(400, 400, 50, Eigen::Isometry2f::Identity());
+  submap = ProbabilityGrid(SUBMAP_SIZE, SUBMAP_SIZE, SUBMAP_RES,
+                           Eigen::Isometry2f::Identity());
 }
 
 void SlamFrontend::handleScan(const lcm::ReceiveBuffer *rbuf,

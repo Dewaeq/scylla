@@ -11,7 +11,7 @@ ProbabilityGrid::ProbabilityGrid(int width, int height, float resolution,
                                  Isometry2f grid_trans)
     : width(width), height(height), resolution(resolution),
       grid_trans(grid_trans) {
-  grid.resize(width * height);
+  grid.resize(width * height, 0);
   origin.x() = -0.5 * width;
   origin.y() = -0.5 * height;
 }
@@ -31,6 +31,8 @@ void ProbabilityGrid::update(const Isometry2f &robot_transform,
 
     add(cells.back(), 0.85);
   }
+
+  num_scans++;
 }
 
 void ProbabilityGrid::add(const Vector2i &cell, float val) {

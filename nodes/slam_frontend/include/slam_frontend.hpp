@@ -7,6 +7,9 @@
 #include "common/probability_grid.hpp"
 #include "messages/LaserScan.hpp"
 
+#define SUBMAP_RES 50
+#define SUBMAP_SIZE 400
+
 class SlamFrontend {
 public:
   SlamFrontend();

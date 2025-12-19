@@ -17,6 +17,7 @@ public:
   void save_as_pgm(const std::string &file_name);
   std::vector<Eigen::Vector2f> get_points_box(const Eigen::Vector2f &center,
                                               float size);
+  int num_scans = 0;
 
 private:
   int width;
