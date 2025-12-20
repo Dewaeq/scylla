@@ -1,6 +1,0 @@
-package messages;
-
-struct ScanPoint {
-  float x;
-  float y;
-}
