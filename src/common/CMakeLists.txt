@@ -1,9 +1,9 @@
-add_library(scylla_common
+add_library(common
   src/lcm_node.cpp
 )
 
-target_link_libraries(scylla_common PUBLIC lcm)
+target_link_libraries(common PUBLIC lcm)
 
-target_include_directories(scylla_common PUBLIC
+target_include_directories(common PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
