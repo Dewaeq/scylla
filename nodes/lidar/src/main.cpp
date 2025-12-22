@@ -64,7 +64,7 @@ int main() {
 
   lidar->reset();
   // give it a moment
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  std::this_thread::sleep_for(std::chrono::seconds(2));
 
   LidarScanMode scan_mode;
   lidar->startScan(false, true, 0, &scan_mode);
@@ -79,13 +79,16 @@ int main() {
     return -1;
   }
 
-  sl_lidar_response_measurement_node_hq_t nodes[8192];
-  size_t count = 8192;
+  const size_t MAX_NODES = 8192;
+  sl_lidar_response_measurement_node_hq_t nodes[MAX_NODES];
 
   while (1) {
+    size_t count = MAX_NODES;
     auto result = lidar->grabScanDataHq(nodes, count);
+
     if (SL_IS_FAIL(result) || result == SL_RESULT_OPERATION_TIMEOUT) {
-      std::cerr << "failed read lidar" << std::endl;
+      std::cerr << "failed to read lidar scan" << std::endl;
+      lidar->setMotorSpeed(600);
       sleep(1);
       continue;
     }
