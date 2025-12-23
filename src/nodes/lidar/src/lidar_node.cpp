@@ -1,7 +1,9 @@
 #include "lidar/lidar_node.hpp"
 
 #include "common/lcm_node.hpp"
+#include "scylla_msgs/lidar_t.hpp"
 #include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <sstream>
 #include <thread>
@@ -70,6 +72,29 @@ void LidarNode::update() {
 
   if (IS_OK(result)) {
     driver_->ascendScanData(nodes, count);
+
+    scylla_msgs::lidar_t msg;
+    msg.timestamp = 0;
+    msg.angle_min = 0;
+    msg.angle_max = 2 * M_PI;
+    msg.angle_increment = (2 * M_PI) / count;
+    msg.range_min = 0.15;
+    msg.range_max = 12.0;
+
+    msg.num_ranges = count;
+    msg.ranges.resize(count);
+    msg.intensities.resize(count);
+
+    for (size_t i = 0; i < count; ++i) {
+      float angle_rad = nodes[i].angle_z_q14 * 90.f / 16384.f * (M_PI / 180.0f);
+      float dist_m = nodes[i].dist_mm_q2 / 4.0f / 1000.0f;
+      float quality = nodes[i].quality;
+
+      msg.ranges[i] = dist_m;
+      msg.intensities[i] = quality;
+    }
+
+    publish("sensors/lidar", msg);
   }
 }
 
