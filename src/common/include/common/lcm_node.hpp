@@ -10,8 +10,15 @@ public:
 
   bool ok() const;
 
-  void spin();
+  // mode 1: event driven
+  // blocks forever, waking up only when a message arrives
+  void spin_blocking();
+  // mode 2: fixed frequency loop:
+  // wakes up [hz] times per second
+  void spin_hz(int hz);
   void spin_once();
+
+  virtual void update() {};
 
   template <typename MessageType>
   void publish(const std::string &channel, const MessageType &msg) {

@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[]) {
   LidarNode node;
-  node.spin();
+  node.spin_hz(10);
 
   return 0;
 }

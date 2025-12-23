@@ -3,12 +3,16 @@
 #include "common/lcm_node.hpp"
 #include "rplidar.h"
 
-using namespace rp::standalone::rplidar;
+using namespace sl;
 
 class LidarNode : public LcmNode {
 public:
   LidarNode();
+  ~LidarNode();
+
+  virtual void update() override;
 
 private:
-  RPlidarDriver *driver_;
+  IChannel *channel_;
+  ILidarDriver *driver_;
 };

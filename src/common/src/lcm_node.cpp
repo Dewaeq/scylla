@@ -1,4 +1,6 @@
 #include "common/lcm_node.hpp"
+#include <chrono>
+#include <thread>
 
 LcmNode::LcmNode(const std::string &node_name)
     : node_name_(node_name), ok_(false) {
@@ -13,9 +15,25 @@ LcmNode::LcmNode(const std::string &node_name)
 
 bool LcmNode::ok() const { return ok_; }
 
-void LcmNode::spin() {
+void LcmNode::spin_blocking() {
   while (lcm_.handle() == 0)
     ;
+}
+
+void LcmNode::spin_hz(int hz) {
+  auto time_per_loop = std::chrono::milliseconds(1000 / hz);
+
+  while (true) {
+    auto start_time = std::chrono::steady_clock::now();
+
+    int safety_count = 50;
+    while (lcm_.handleTimeout(0) > 0 && safety_count--)
+      ;
+
+    update();
+
+    std::this_thread::sleep_until(start_time + time_per_loop);
+  }
 }
 
 void LcmNode::spin_once() { lcm_.handleTimeout(0); }
