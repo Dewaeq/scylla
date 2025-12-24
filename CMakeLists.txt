@@ -3,8 +3,14 @@ project(scylla CXX)
 
 find_package(lcm REQUIRED)
 
+# set output directories
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
 add_subdirectory(src)
 
+# configure LCM
 file(GLOB LCM_FILES lcm_types/*.lcm)
 set(LCM_GEN_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
 # dummy file that acts as a flag. If it's missing or older than the .lcm files,
