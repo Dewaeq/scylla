@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <iostream>
 #include <lcm/lcm-cpp.hpp>
 #include <ostream>
@@ -27,11 +28,25 @@ public:
 
   // usage: subscribe("CHANNEL", &MyClass::callback, this);
   template <typename M, typename T>
-  void subscribe(const std::string &channel,
-                 void (T::*handler)(const lcm::ReceiveBuffer *,
-                                    const std::string &, const M *),
+  void subscribe(const std::string &channel, void (T::*handler)(const M *),
                  T *target) {
-    lcm_.subscribe(channel, handler, target);
+
+    lcm::LCM::HandlerFunction<M> wrapper =
+        [target, handler](const lcm::ReceiveBuffer *rbuf,
+                          const std::string &chan,
+                          const M *msg) { (target->*handler)(msg); };
+
+    lcm_.subscribe(channel, wrapper);
+  }
+
+  // usage: subscribe("CHANNEL", <callback>);
+  template <typename M>
+  void subscribe(const std::string &channel,
+                 std::function<void(const M *)> callback) {
+    lcm::LCM::HandlerFunction<M> wrapper =
+        [callback](const lcm::ReceiveBuffer *rbuf, const std::string &chan,
+                   const M *msg) { callback(msg); };
+    lcm_.subscribe(channel, wrapper);
   }
 
 protected:
