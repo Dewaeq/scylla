@@ -3,6 +3,9 @@
 #include <chrono>
 
 ControlNode::ControlNode() : LcmNode("control_node") {
+  driver_.set_steering(0);
+  driver_.set_throttle(0);
+
   subscribe("drive_command", &ControlNode::handle_command, this);
 }
 

@@ -15,5 +15,5 @@ private:
   void handle_command(const scylla_msgs::drive_command_t *msg);
 
   MotorDriver driver_;
-  int64_t last_cmd_time_ms_;
+  int64_t last_cmd_time_ms_ = 0;
 };

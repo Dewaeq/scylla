@@ -12,6 +12,7 @@ sys.path.append(os.path.abspath("build/python"))
 from scylla_msgs import lidar_t
 from scylla_msgs import drive_command_t
 
+SPEED = 0.5
 MAX_DIST_M = 8.0
 SCALE = 0
 SIZE = 800
@@ -84,9 +85,9 @@ def process_input():
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_UP]:
-        cmd.throttle = 1.0
+        cmd.throttle = 1.0 * SPEED
     elif keys[pygame.K_DOWN]:
-        cmd.throttle = -1.0
+        cmd.throttle = -1.0 * SPEED
     else:
         cmd.throttle = 0.0
 
@@ -105,7 +106,6 @@ def process_input():
     ):
         lc.publish("drive_command", cmd.encode())
         last_cmd = cmd
-        print(f"Cmd: T={cmd.throttle:.1f} S={cmd.steering:.1f}")
 
 
 def main():
