@@ -27,9 +27,11 @@ void MotorDriver::set_throttle(double val) {
   bool forward = val > 0;
   int pwm = std::abs(val) * 100;
 
+  std::cout << "pwm value: " << pwm << std::endl;
+
   digitalWrite(PIN_M1, forward);
   digitalWrite(PIN_M2, !forward);
-  digitalWrite(PIN_M_PWM, pwm);
+  pwmWrite(PIN_M_PWM, pwm);
 }
 
 void MotorDriver::set_steering(double val) {
