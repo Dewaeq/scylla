@@ -7,9 +7,6 @@ struct lidar_t
     float    angle_min;       // Start angle of the scan [rad]
     float    angle_max;       // End angle of the scan [rad]
     float    angle_increment; // Angular distance between measurements [rad]
-    float    time_increment;  // Time between measurements [seconds]
-    float    scan_time;       // Time between scans [seconds]
-    
     float    range_min;       // Minimum range value [m]
     float    range_max;       // Maximum range value [m]
 

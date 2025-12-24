@@ -94,7 +94,10 @@ void LidarNode::update() {
       msg.intensities[i] = quality;
     }
 
+    info("points: " + std::to_string(count));
     publish("sensors/lidar", msg);
+  } else {
+    error("failed to read lidar data: " + std::to_string(result));
   }
 }
 

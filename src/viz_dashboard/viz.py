@@ -98,9 +98,11 @@ def process_input():
         cmd.steering = 0.0
 
     # only publish on change or after 100ms
-    if (cmd.time_stamp - last_cmd.time_stamp >= 100e3)(
-        cmd.throttle != last_cmd.throttle
-    ) or (cmd.steering != last_cmd.steering):
+    if (
+        (cmd.time_stamp - last_cmd.time_stamp >= 100e3)
+        or (cmd.throttle != last_cmd.throttle)
+        or (cmd.steering != last_cmd.steering)
+    ):
         lc.publish("drive_command", cmd.encode())
         last_cmd = cmd
         print(f"Cmd: T={cmd.throttle:.1f} S={cmd.steering:.1f}")
