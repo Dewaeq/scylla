@@ -5,10 +5,6 @@ import lcm
 import pygame
 import time
 
-# --- BOILERPLATE TO FIND GENERATED MODULES ---
-# We need to add the 'build/python' folder to sys.path so we can import the LCM artifacts
-sys.path.append(os.path.abspath("build/python"))
-
 from scylla_msgs import lidar_t
 from scylla_msgs import drive_command_t
 
@@ -26,7 +22,7 @@ font = pygame.font.SysFont("monospace", 18)
 
 msg_lidar = None
 last_cmd = drive_command_t()
-last_cmd.time_stamp = 0
+last_cmd.timestamp = 0
 last_cmd.throttle = 0.0
 last_cmd.steering = 0.0
 
@@ -55,32 +51,30 @@ def draw_lidar():
     if msg_lidar is None:
         return
 
-    info = font.render(f"Points: {msg_lidar.num_ranges}", True, (255, 255, 0))
+    info = font.render(f"Points: {msg_lidar.num_points}", True, (255, 255, 0))
     display.blit(info, (10, 10))
 
-    angle_current = msg_lidar.angle_min
+    for i in range(msg_lidar.num_points):
+        dist = msg_lidar.ranges[i]
+        angle = msg_lidar.angles[i]
 
-    for r in msg_lidar.ranges:
-        if r < 0.1 or r > MAX_DIST_M:
-            angle_current += msg_lidar.angle_increment
+        if dist < 0.1 or dist > MAX_DIST_M:
             continue
 
-        x_m = r * math.cos(angle_current)
-        y_m = r * math.sin(angle_current)
+        x_m = dist * math.cos(angle)
+        y_m = dist * math.sin(angle)
 
         px = CENTER[0] + int(y_m * SCALE)
         py = CENTER[1] - int(x_m * SCALE)
 
-        intensity = max(50, min(255, int(255 * (1.0 - r / MAX_DIST_M))))
+        intensity = max(50, min(255, int(255 * (1.0 - dist / MAX_DIST_M))))
         display.set_at((px, py), (255, 0, 255, intensity))
-
-        angle_current += msg_lidar.angle_increment
 
 
 def process_input():
     global last_cmd
     cmd = drive_command_t()
-    cmd.time_stamp = int(time.time() * 1000000)
+    cmd.timestamp = int(time.time() * 1000000)
 
     keys = pygame.key.get_pressed()
 
@@ -100,7 +94,7 @@ def process_input():
 
     # only publish on change or after 100ms
     if (
-        (cmd.time_stamp - last_cmd.time_stamp >= 100e3)
+        (cmd.timestamp - last_cmd.timestamp >= 100e3)
         or (cmd.throttle != last_cmd.throttle)
         or (cmd.steering != last_cmd.steering)
     ):

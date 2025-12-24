@@ -75,14 +75,10 @@ void LidarNode::update() {
 
     scylla_msgs::lidar_t msg;
     msg.timestamp = 0;
-    msg.angle_min = 0;
-    msg.angle_max = 2 * M_PI;
-    msg.angle_increment = (2 * M_PI) / count;
-    msg.range_min = 0.15;
-    msg.range_max = 12.0;
 
-    msg.num_ranges = count;
+    msg.num_points = count;
     msg.ranges.resize(count);
+    msg.angles.resize(count);
     msg.intensities.resize(count);
 
     for (size_t i = 0; i < count; ++i) {
@@ -90,11 +86,14 @@ void LidarNode::update() {
       float dist_m = nodes[i].dist_mm_q2 / 4.0f / 1000.0f;
       float quality = nodes[i].quality;
 
+      if (dist_m < 0.05 || dist_m > 10.0)
+        continue;
+
       msg.ranges[i] = dist_m;
+      msg.angles[i] = angle_rad;
       msg.intensities[i] = quality;
     }
 
-    info("points: " + std::to_string(count));
     publish("sensors/lidar", msg);
   } else {
     error("failed to read lidar data: " + std::to_string(result));
