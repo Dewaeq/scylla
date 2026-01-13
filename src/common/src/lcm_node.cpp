@@ -45,3 +45,19 @@ void LcmNode::error(const std::string &s) { log(std::cerr, "[ERROR]: " + s); }
 void LcmNode::log(std::ostream &os, const std::string &s) {
   os << "[" << node_name_ << "]: " << s << std::endl;
 }
+
+double LcmNode::now() {
+  auto time = std::chrono::steady_clock::now();
+  auto sec =
+      std::chrono::duration_cast<std::chrono::seconds>(time.time_since_epoch());
+
+  return std::chrono::duration<double>(sec).count();
+}
+
+int64_t LcmNode::now_ns() {
+  auto time = std::chrono::steady_clock::now();
+  auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+      time.time_since_epoch());
+
+  return static_cast<int64_t>(ns.count());
+}

@@ -74,7 +74,7 @@ def draw_lidar():
 def process_input():
     global last_cmd
     cmd = drive_command_t()
-    cmd.timestamp = int(time.time() * 1000000)
+    cmd.timestamp = int(time.time() * 1e9)
 
     keys = pygame.key.get_pressed()
 
@@ -94,7 +94,7 @@ def process_input():
 
     # only publish on change or after 100ms
     if (
-        (cmd.timestamp - last_cmd.timestamp >= 100e3)
+        (cmd.timestamp - last_cmd.timestamp >= 100e6)
         or (cmd.throttle != last_cmd.throttle)
         or (cmd.steering != last_cmd.steering)
     ):

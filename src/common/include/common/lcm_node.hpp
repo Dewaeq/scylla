@@ -49,6 +49,12 @@ public:
     lcm_.subscribe(channel, wrapper);
   }
 
+  // current time in seconds
+  double now();
+
+  // current time in nanoseconds
+  int64_t now_ns();
+
 protected:
   void info(const std::string &s);
   void warn(const std::string &s);

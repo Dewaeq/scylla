@@ -74,7 +74,7 @@ void LidarNode::update() {
     driver_->ascendScanData(nodes, count);
 
     scylla_msgs::lidar_t msg;
-    msg.timestamp = 0;
+    msg.timestamp = now_ns();
 
     msg.num_points = count;
     msg.ranges.resize(count);
