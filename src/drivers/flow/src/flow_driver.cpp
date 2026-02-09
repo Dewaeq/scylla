@@ -26,20 +26,21 @@ int FlowDriver::begin() {
   // start power up sequence
   digitalWrite(CS_PIN, LOW);
   digitalWrite(CS_PIN, HIGH);
+  delay(2);
 
   write_register(REG_POWER_UP_RESET, 0x5a);
-  delayMicroseconds(5);
+  delay(2);
+
   read_register(REG_MOTION);
   read_register(REG_DELTA_X_L);
   read_register(REG_DELTA_X_H);
   read_register(REG_DELTA_Y_L);
   read_register(REG_DELTA_Y_H);
+  delay(20);
   // finished power up sequence
 
-  delay(1);
-
   uint8_t pid = read_register(REG_PRODUCT_ID);
-  std::cout << "pid: 0x" << std::hex << pid << std::endl;
+  std::cout << "pid: 0x" << std::hex << (int)pid << std::endl;
 
   return 0;
 }
