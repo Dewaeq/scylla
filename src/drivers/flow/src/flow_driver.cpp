@@ -14,9 +14,9 @@ int FlowDriver::begin() {
     return -1;
   }
 
-  int err = wiringPiSPISetup(SPI_CHANNEL, SPI_SPEED);
-  if (err != 0) {
-    std::cerr << "wiringPi SPI setup failed, code: " << err << std::endl;
+  int fd = wiringPiSPISetup(SPI_CHANNEL, SPI_SPEED);
+  if (fd < 0) {
+    std::cerr << "wiringPi SPI setup failed" << std::endl;
     return -2;
   }
 
