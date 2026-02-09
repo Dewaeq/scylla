@@ -23,9 +23,22 @@ int FlowDriver::begin() {
   pinMode(CS_PIN, OUTPUT);
   digitalWrite(CS_PIN, HIGH);
 
+  // start power up sequence
+  digitalWrite(CS_PIN, LOW);
+  digitalWrite(CS_PIN, HIGH);
+
+  write_register(REG_POWER_UP_RESET, 0x5a);
+  delayMicroseconds(5);
+  read_register(REG_MOTION);
+  read_register(REG_DELTA_X_L);
+  read_register(REG_DELTA_X_H);
+  read_register(REG_DELTA_Y_L);
+  read_register(REG_DELTA_Y_H);
+  // finished power up sequence
+
   delay(1);
 
-  uint8_t pid = read_register(0x00);
+  uint8_t pid = read_register(REG_PRODUCT_ID);
   std::cout << "pid: 0x" << std::hex << pid << std::endl;
 
   return 0;
