@@ -9,7 +9,7 @@
 FlowDriver::FlowDriver() {}
 
 int FlowDriver::begin() {
-  if (wiringPiSetup() != -1) {
+  if (wiringPiSetup() != 0) {
     std::cerr << "wiringPi setup failed" << std::endl;
     return -1;
   }
