@@ -22,6 +22,7 @@ private:
   const uint8_t REG_DELTA_Y_H = 0x06;
 
   uint8_t read_register(uint8_t reg);
-
   void write_register(uint8_t reg, uint8_t data);
+
+  void init_registers();
 };

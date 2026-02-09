@@ -40,10 +40,17 @@ int FlowDriver::begin() {
   // finished power up sequence
 
   uint8_t pid = read_register(REG_PRODUCT_ID);
-  std::cout << "pid: 0x" << std::hex << (int)pid << std::endl;
+  if (pid != 0x49) {
+    std::cout << "pid: 0x" << std::hex << (int)pid << std::endl;
+    return -3;
+  }
+
+  init_registers();
 
   return 0;
 }
+
+void FlowDriver::init_registers() {}
 
 uint8_t FlowDriver::read_register(uint8_t reg) {
   // from datasheet:
