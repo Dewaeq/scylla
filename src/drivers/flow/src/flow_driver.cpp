@@ -9,13 +9,14 @@
 FlowDriver::FlowDriver() {}
 
 int FlowDriver::begin() {
-  if (wiringPiSetup() != 0) {
-    std::cerr << "wiringPi setup failed" << std::endl;
+  if (wiringPiSetupGpio() != 0) {
+    std::cerr << "wiringPi GPIO setup failed" << std::endl;
     return -1;
   }
 
-  if (wiringPiSPISetup(SPI_CHANNEL, SPI_SPEED) != 0) {
-    std::cerr << "wiringPi SPI setup failed" << std::endl;
+  int err = wiringPiSPISetup(SPI_CHANNEL, SPI_SPEED);
+  if (err != 0) {
+    std::cerr << "wiringPi SPI setup failed, code: " << err << std::endl;
     return -2;
   }
 
