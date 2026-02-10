@@ -7,4 +7,6 @@ FlowNode::FlowNode() : LcmNode("flow_node") {
     error("failed to init flow driver!");
     exit(-1);
   }
+
+  info("flow driver initialised");
 }
