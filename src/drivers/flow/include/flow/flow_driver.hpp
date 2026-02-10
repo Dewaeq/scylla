@@ -6,6 +6,7 @@ public:
   FlowDriver();
 
   int begin();
+  void read_motion(int16_t &delta_x, int16_t &delta_y);
 
 private:
   const int SPI_CHANNEL = 0;
@@ -25,4 +26,6 @@ private:
   void write_register(uint8_t reg, uint8_t data);
 
   int init_registers();
+
+  int fd_;
 };

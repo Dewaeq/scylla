@@ -15,8 +15,8 @@ int FlowDriver::begin() {
     return -1;
   }
 
-  int fd = wiringPiSPISetup(SPI_CHANNEL, SPI_SPEED);
-  if (fd < 0) {
+  fd_ = wiringPiSPISetup(SPI_CHANNEL, SPI_SPEED);
+  if (fd_ < 0) {
     std::cerr << "wiringPi SPI setup failed" << std::endl;
     return -2;
   }
@@ -26,11 +26,12 @@ int FlowDriver::begin() {
 
   // start power up sequence
   digitalWrite(CS_PIN, LOW);
+  delayMicroseconds(100);
   digitalWrite(CS_PIN, HIGH);
-  delay(2);
+  delay(50);
 
   write_register(REG_POWER_UP_RESET, 0x5a);
-  delay(2);
+  delay(50);
 
   // read motion registers once
   read_register(REG_MOTION);
@@ -67,16 +68,22 @@ int FlowDriver::init_registers() {
   write_register(0x7F, 0x0E);
 
   bool success = false;
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 5; i++) {
     write_register(0x43, 0x10);
-    if (read_register(0x47) == 0x08) {
+    delay(10);
+    uint8_t val = read_register(0x47);
+    std::cout << "read " << std::hex << (int)val << std::endl;
+    // if (read_register(0x47) == 0x08) {
+    if (val == 0x08) {
       success = true;
       break;
     }
+
+    delay(10);
   }
 
-  if (!success)
-    return -1;
+  // if (!success)
+  //   return -1;
 
   if (read_register(0x67) & 0x80)
     write_register(0x48, 0x04);
@@ -181,6 +188,24 @@ int FlowDriver::init_registers() {
   return 0;
 }
 
+void FlowDriver::read_motion(int16_t &delta_x, int16_t &delta_y) {
+  uint8_t motion = read_register(REG_MOTION);
+
+  if (motion & 0x80) {
+    uint8_t xl = read_register(REG_DELTA_X_L);
+    uint8_t xh = read_register(REG_DELTA_X_H);
+    uint8_t yl = read_register(REG_DELTA_Y_L);
+    uint8_t yh = read_register(REG_DELTA_Y_H);
+
+    // Combine Low and High bytes (16-bit signed)
+    delta_x = (int16_t)((xh << 8) | xl);
+    delta_y = (int16_t)((yh << 8) | yl);
+  } else {
+    delta_x = 0;
+    delta_y = 0;
+  }
+}
+
 uint8_t FlowDriver::read_register(uint8_t reg) {
   // from datasheet:
   // "The first byte contains the address (seven bits) and has '0' as its MSB to
@@ -190,10 +215,30 @@ uint8_t FlowDriver::read_register(uint8_t reg) {
   buffer[0] = reg & 0x7f;
 
   digitalWrite(CS_PIN, LOW);
+  delayMicroseconds(5);
   wiringPiSPIDataRW(SPI_CHANNEL, buffer, 2);
   digitalWrite(CS_PIN, HIGH);
 
+  delayMicroseconds(50);
+
   return buffer[1];
+
+  // uint8_t addr = reg & 0x7F;
+  // uint8_t data = 0x00;
+  //
+  // digitalWrite(CS_PIN, LOW);
+  //
+  // wiringPiSPIDataRW(SPI_CHANNEL, &addr, 1);
+  //
+  // delayMicroseconds(5);
+  //
+  // wiringPiSPIDataRW(SPI_CHANNEL, &data, 1);
+  //
+  // digitalWrite(CS_PIN, HIGH);
+  //
+  // delayMicroseconds(20);
+  //
+  // return data;
 }
 
 void FlowDriver::write_register(uint8_t reg, uint8_t data) {
@@ -206,6 +251,9 @@ void FlowDriver::write_register(uint8_t reg, uint8_t data) {
   buffer[1] = data;
 
   digitalWrite(CS_PIN, LOW);
+  delayMicroseconds(5);
   wiringPiSPIDataRW(SPI_CHANNEL, buffer, 2);
   digitalWrite(CS_PIN, HIGH);
+
+  delayMicroseconds(50);
 }

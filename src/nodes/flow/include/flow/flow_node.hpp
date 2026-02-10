@@ -7,6 +7,8 @@ class FlowNode : public LcmNode {
 public:
   FlowNode();
 
+  virtual void update() override;
+
 private:
   FlowDriver driver;
 };
