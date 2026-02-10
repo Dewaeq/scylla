@@ -61,53 +61,49 @@ int FlowDriver::init_registers() {
   // registers are PixArt proprietary information, thus no additional
   // information is provided in this datasheet with regards to these
   // register’s descriptions."
-  write_register(0x7f, 0x00);
+  write_register(0x7F, 0x00);
   write_register(0x55, 0x01);
   write_register(0x50, 0x07);
-  write_register(0x7f, 0x0e);
-  write_register(0x43, 0x10);
+  write_register(0x7F, 0x0E);
 
-  if (read_register(0x47) != 0x08) {
-    bool success = false;
-    for (int i = 0; i < 3; i++) {
-      write_register(0x43, 0x10);
-      if (read_register(0x47) == 0x08) {
-        success = true;
-        break;
-      }
+  bool success = false;
+  for (int i = 0; i < 3; i++) {
+    write_register(0x43, 0x10);
+    if (read_register(0x47) == 0x08) {
+      success = true;
+      break;
     }
-
-    if (!success)
-      return -1;
   }
+
+  if (!success)
+    return -1;
 
   if (read_register(0x67) & 0x80)
     write_register(0x48, 0x04);
   else
     write_register(0x48, 0x02);
 
-  write_register(0x7f, 0x00);
-  write_register(0x51, 0x7b);
+  write_register(0x7F, 0x00);
+  write_register(0x51, 0x7B);
   write_register(0x50, 0x00);
   write_register(0x55, 0x00);
-  write_register(0x7f, 0x0e);
+  write_register(0x7F, 0x0E);
 
   if (read_register(0x73) == 0x00) {
     uint8_t c1 = read_register(0x70);
     uint8_t c2 = read_register(0x71);
 
-    write_register(0x7f, 0x00);
-    write_register(0x61, 0xad);
+    write_register(0x7F, 0x00);
+    write_register(0x61, 0xAD);
     write_register(0x51, 0x70);
-    write_register(0x7f, 0x0e);
+    write_register(0x7F, 0x0E);
     write_register(0x70, std::min(0x3f, c1 <= 28 ? c1 + 14 : c1 + 11));
     write_register(0x71, (int)c2 * 45 / 100);
   }
 
-  write_register(0x7f, 0x00);
-  write_register(0x61, 0xad);
-  write_register(0x7f, 0x03);
-
+  write_register(0x7F, 0x00);
+  write_register(0x61, 0xAD);
+  write_register(0x7F, 0x03);
   write_register(0x40, 0x00);
   write_register(0x7F, 0x05);
   write_register(0x41, 0xB3);
