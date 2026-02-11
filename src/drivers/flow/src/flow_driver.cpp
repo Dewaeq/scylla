@@ -268,7 +268,7 @@ int FlowDriver::init_registers() {
   return 0;
 }
 
-void FlowDriver::read_motion(int16_t &delta_x, int16_t &delta_y) {
+bool FlowDriver::read_motion(int16_t &delta_x, int16_t &delta_y) {
   uint8_t motion = read_register(REG_MOTION);
 
   if (motion & 0x80) {
@@ -280,9 +280,11 @@ void FlowDriver::read_motion(int16_t &delta_x, int16_t &delta_y) {
     // combine low and high bytes
     delta_x = (int16_t)((xh << 8) | xl);
     delta_y = (int16_t)((yh << 8) | yl);
+    return true;
   } else {
     delta_x = 0;
     delta_y = 0;
+    return false;
   }
 }
 

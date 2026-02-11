@@ -1,0 +1,9 @@
+package scylla_msgs;
+
+struct flow_t 
+{
+  int64_t timestamp;
+
+  float dx;
+  float dy;
+}

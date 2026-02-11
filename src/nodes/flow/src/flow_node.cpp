@@ -1,7 +1,7 @@
 #include "flow/flow_node.hpp"
+
 #include "common/lcm_node.hpp"
-#include <cstdlib>
-#include <sstream>
+#include "scylla_msgs/flow_t.hpp"
 
 FlowNode::FlowNode() : LcmNode("flow_node") {
   if (driver.begin() != 0) {
@@ -14,9 +14,13 @@ FlowNode::FlowNode() : LcmNode("flow_node") {
 
 void FlowNode::update() {
   int16_t dx, dy;
-  driver.read_motion(dx, dy);
 
-  std::stringstream ss;
-  ss << "dx: " << dx << ", dy: " << dy;
-  info(ss.str());
+  if (driver.read_motion(dx, dy)) {
+    scylla_msgs::flow_t msg;
+    msg.timestamp = now_ns();
+    msg.dx = dx;
+    msg.dy = dy;
+
+    publish("sensors/flow", msg);
+  };
 }

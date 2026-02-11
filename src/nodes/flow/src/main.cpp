@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[]) {
   FlowNode node;
-  node.spin_hz(10);
+  node.spin_hz(200);
 
   return 0;
 }
