@@ -11,7 +11,7 @@ public:
 private:
   const int SPI_CHANNEL = 0;
   const int SPI_SPEED = 2000000; // 2MHz
-  const int CS_PIN = 10;
+  const int CS_PIN = 25;
 
   const uint8_t REG_PRODUCT_ID = 0x00;
   const uint8_t REG_REVISION_ID = 0x01;
