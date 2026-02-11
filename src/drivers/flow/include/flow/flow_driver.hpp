@@ -7,6 +7,7 @@ public:
 
   int begin();
   bool read_motion(int16_t &delta_x, int16_t &delta_y);
+  bool read_motion_burst(int16_t &delta_x, int16_t &delta_y);
 
 private:
   const int SPI_CHANNEL = 0;
@@ -20,6 +21,7 @@ private:
   const uint8_t REG_REVISION_ID = 0x01;
   const uint8_t REG_POWER_UP_RESET = 0x3A;
   const uint8_t REG_MOTION = 0x02;
+  const uint8_t REG_MOTION_BURST = 0x16;
   const uint8_t REG_DELTA_X_L = 0x03;
   const uint8_t REG_DELTA_X_H = 0x04;
   const uint8_t REG_DELTA_Y_L = 0x05;

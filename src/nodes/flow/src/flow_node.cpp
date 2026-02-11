@@ -13,14 +13,13 @@ FlowNode::FlowNode() : LcmNode("flow_node") {
 }
 
 void FlowNode::update() {
-  int16_t dx, dy;
+  static int16_t dx, dy;
+  static scylla_msgs::flow_t msg;
 
-  if (driver.read_motion(dx, dy)) {
-    scylla_msgs::flow_t msg;
-    msg.timestamp = now_ns();
-    msg.dx = dx;
-    msg.dy = dy;
+  driver.read_motion_burst(dx, dy);
 
-    publish("sensors/flow", msg);
-  };
+  msg.timestamp = now_ns();
+  msg.dx = dx;
+  msg.dy = dy;
+  publish("sensors/flow", msg);
 }

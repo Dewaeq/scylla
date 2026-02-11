@@ -288,6 +288,42 @@ bool FlowDriver::read_motion(int16_t &delta_x, int16_t &delta_y) {
   }
 }
 
+bool FlowDriver::read_motion_burst(int16_t &delta_x, int16_t &delta_y) {
+  digitalWrite(CS_PIN, LOW);
+  delayMicroseconds(50);
+
+  spi_transfer(REG_MOTION_BURST);
+  delayMicroseconds(50);
+
+  uint8_t buf[12];
+  for (int i = 0; i < 6; i++) {
+    buf[i] = spi_transfer(0);
+  }
+
+  digitalWrite(CS_PIN, HIGH);
+  delayMicroseconds(50);
+
+  uint8_t motion = buf[0];
+  uint8_t squal = buf[6];
+  uint8_t shutter_upper = buf[10];
+
+  if (motion & 0x80 && (squal >= 0x19 || shutter_upper != 0x1F)) {
+    uint8_t xl = buf[2];
+    uint8_t xh = buf[3];
+    uint8_t yl = buf[4];
+    uint8_t yh = buf[5];
+
+    // combine low and high bytes
+    delta_x = (int16_t)((xh << 8) | xl);
+    delta_y = (int16_t)((yh << 8) | yl);
+    return true;
+  } else {
+    delta_x = 0;
+    delta_y = 0;
+    return false;
+  }
+}
+
 uint8_t FlowDriver::spi_transfer(uint8_t data) {
   uint8_t result = 0;
 
@@ -330,7 +366,7 @@ uint8_t FlowDriver::read_register(uint8_t reg) {
   delayMicroseconds(50);
 
   digitalWrite(CS_PIN, HIGH);
-  delayMicroseconds(200);
+  delayMicroseconds(50);
 
   return data;
 }
@@ -350,5 +386,5 @@ void FlowDriver::write_register(uint8_t reg, uint8_t data) {
 
   delayMicroseconds(50);
   digitalWrite(CS_PIN, HIGH);
-  delayMicroseconds(200);
+  delayMicroseconds(50);
 }
