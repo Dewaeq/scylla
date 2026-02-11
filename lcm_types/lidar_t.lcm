@@ -4,7 +4,6 @@ struct lidar_t
 {
     int64_t  timestamp;
     
-    // Actual data
     int32_t  num_points;
     float    ranges[num_points];  // in meter
     float    angles[num_points];  // in radians
