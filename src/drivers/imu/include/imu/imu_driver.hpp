@@ -1,0 +1,35 @@
+#pragma once
+
+struct ImuData {
+  float ax, ay, az;
+  float gx, gy, gz;
+  float mx, my, mz;
+};
+
+class ImuDriver {
+public:
+  ImuDriver();
+
+  int begin();
+
+  ImuData read_data();
+
+private:
+  // IMU:
+  const int LSM6DSOX_ADDR = 0x6A;
+  const int LSM6DSOX_WHO_AM_I = 0x0F;
+  const int LSM6DSOX_CTRL1_XL = 0x10;
+  const int LSM6DSOX_CTRL2_G = 0x11;
+  const int LSM6DSOX_OUTX_L_G = 0x22;
+  const int LSM6DSOX_OUTX_L_A = 0x28;
+  // Magnetometer:
+  const int LIS3MDL_ADDR = 0x10;
+  const int LIS3MDL_WHO_AM_I = 0x0F;
+  const int LIS3MDL_CTRL_REG1 = 0x20;
+  const int LIS3MDL_CTRL_REG2 = 0x21;
+  const int LIS3MDL_CTRL_REG3 = 0x22;
+  const int LIS3MDL_OUT_X_L = 0x28;
+
+  int fd_imu_;
+  int fd_mag_;
+};
