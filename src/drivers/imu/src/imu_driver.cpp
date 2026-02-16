@@ -1,6 +1,7 @@
 #include "imu/imu_driver.hpp"
 
 #include <cmath>
+#include <cstdint>
 #include <iostream>
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
@@ -68,30 +69,35 @@ int ImuDriver::begin() {
   return 0;
 }
 
-ImuData ImuDriver::read_data() {
+bool ImuDriver::has_imu_data() {
+  const int status = wiringPiI2CReadReg8(fd_imu_, LSM6DSOX_STATUS_REG);
+  if (status < 0)
+    return false;
+  // bit 0: accelerometer
+  // bit 1: gyroscope
+  // bit 2: temperature
+  return (status & 0x03) == 0x03;
+}
+
+bool ImuDriver::has_mag_data() {
+  const int status = wiringPiI2CReadReg8(fd_mag_, LIS3MDL_STATUS_REG);
+  if (status < 0)
+    return false;
+  return (status & 0x08) == 0x08;
+}
+
+ImuData ImuDriver::read_imu() {
   ImuData data;
 
   // gyro
-  int16_t raw_gx = (int16_t)wiringPiI2CReadReg16(fd_imu_, LSM6DSOX_OUTX_L_G);
-  int16_t raw_gy =
-      (int16_t)wiringPiI2CReadReg16(fd_imu_, LSM6DSOX_OUTX_L_G + 2);
-  int16_t raw_gz =
-      (int16_t)wiringPiI2CReadReg16(fd_imu_, LSM6DSOX_OUTX_L_G + 4);
+  int16_t raw_gx = wiringPiI2CReadReg16(fd_imu_, LSM6DSOX_OUTX_L_G);
+  int16_t raw_gy = wiringPiI2CReadReg16(fd_imu_, LSM6DSOX_OUTX_L_G + 2);
+  int16_t raw_gz = wiringPiI2CReadReg16(fd_imu_, LSM6DSOX_OUTX_L_G + 4);
 
   // accelerometer
-  int16_t raw_ax = (int16_t)wiringPiI2CReadReg16(fd_imu_, LSM6DSOX_OUTX_L_A);
-  int16_t raw_ay =
-      (int16_t)wiringPiI2CReadReg16(fd_imu_, LSM6DSOX_OUTX_L_A + 2);
-  int16_t raw_az =
-      (int16_t)wiringPiI2CReadReg16(fd_imu_, LSM6DSOX_OUTX_L_A + 4);
-
-  // magnetometer
-  int16_t raw_mx =
-      (int16_t)wiringPiI2CReadReg16(fd_mag_, LIS3MDL_OUT_X_L | 0x80);
-  int16_t raw_my =
-      (int16_t)wiringPiI2CReadReg16(fd_mag_, (LIS3MDL_OUT_X_L + 2) | 0x80);
-  int16_t raw_mz =
-      (int16_t)wiringPiI2CReadReg16(fd_mag_, (LIS3MDL_OUT_X_L + 4) | 0x80);
+  int16_t raw_ax = wiringPiI2CReadReg16(fd_imu_, LSM6DSOX_OUTX_L_A);
+  int16_t raw_ay = wiringPiI2CReadReg16(fd_imu_, LSM6DSOX_OUTX_L_A + 2);
+  int16_t raw_az = wiringPiI2CReadReg16(fd_imu_, LSM6DSOX_OUTX_L_A + 4);
 
   // conversions
   // Accel: 2g range -> 0.061 mg/LSB (table 2)
@@ -105,6 +111,17 @@ ImuData ImuDriver::read_data() {
   data.gx = raw_gx * gyro_scale;
   data.gy = raw_gy * gyro_scale;
   data.gz = raw_gz * gyro_scale;
+
+  return data;
+}
+
+MagData ImuDriver::read_mag() {
+  MagData data;
+
+  // magnetometer
+  int16_t raw_mx = wiringPiI2CReadReg16(fd_mag_, LIS3MDL_OUT_X_L | 0x80);
+  int16_t raw_my = wiringPiI2CReadReg16(fd_mag_, (LIS3MDL_OUT_X_L + 2) | 0x80);
+  int16_t raw_mz = wiringPiI2CReadReg16(fd_mag_, (LIS3MDL_OUT_X_L + 4) | 0x80);
 
   // Mag: 4 gauss range -> 6842 LSB/gauss (table 2)
   // 1 Gauss = 100 uTesla

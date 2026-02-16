@@ -12,13 +12,20 @@ ImuNode::ImuNode() : LcmNode("imu_node") {
 }
 
 void ImuNode::update() {
-  const auto data = driver_.read_data();
-  std::stringstream s;
-  s << "[data]: "
-    << "\tax: " << data.ax << "\tay: " << data.ay << "\taz: " << data.az
-    << std::endl
-    << "\tgx: " << data.gx << "\tgy: " << data.gy << "\tgz: " << data.gz
-    << std::endl
-    << "\tmx: " << data.mx << "\tmy: " << data.my << "\tmz: " << data.mz;
-  info(s.str());
+  if (driver_.has_imu_data()) {
+    const auto data = driver_.read_imu();
+    std::stringstream s;
+    s << "[imu data]: "
+      << "\tax: " << data.ax << "\tay: " << data.ay << "\taz: " << data.az
+      << std::endl
+      << "\tgx: " << data.gx << "\tgy: " << data.gy << "\tgz: " << data.gz;
+    // info(s.str());
+  }
+  if (driver_.has_mag_data()) {
+    const auto data = driver_.read_mag();
+    std::stringstream s;
+    s << "[mag data]: "
+      << "\tmx: " << data.mx << "\tmy: " << data.my << "\tmz: " << data.mz;
+    info(s.str());
+  }
 }
