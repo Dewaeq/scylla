@@ -2,11 +2,24 @@
 
 #include <cmath>
 #include <iostream>
+#include <wiringPi.h>
 #include <wiringPiI2C.h>
 
 ImuDriver::ImuDriver() {}
 
 int ImuDriver::begin() {
+  if (wiringPiSetupGpio() != 0) {
+    std::cerr << "wiringPi GPIO setup failed" << std::endl;
+    return -1;
+  }
+
+  std::cout << "power cycling IMU..." << std::endl;
+  pinMode(POWER_PIN, OUTPUT);
+  digitalWrite(POWER_PIN, LOW);
+  delay(100);
+  digitalWrite(POWER_PIN, HIGH);
+  delay(100);
+
   fd_imu_ = wiringPiI2CSetup(LSM6DSOX_ADDR);
   if (fd_imu_ < 0) {
     std::cerr << "wiringPi LSM6DSOX I2C setup failed" << std::endl;
@@ -27,10 +40,13 @@ int ImuDriver::begin() {
     return -1;
   }
 
+  wiringPiI2CWriteReg8(fd_mag_, LIS3MDL_CTRL_REG2, 0x04);
+  delay(10);
+
   // verify ID
   int who_mag = wiringPiI2CReadReg8(fd_mag_, LIS3MDL_WHO_AM_I);
-  if (who_imu != 0x6C) {
-    std::cout << "wrong LIS3MDL id: got 0x" << std::hex << who_imu << std::endl;
+  if (who_mag != 0x3D) {
+    std::cout << "wrong LIS3MDL id: got 0x" << std::hex << who_mag << std::endl;
     return -1;
   }
 
@@ -70,19 +86,22 @@ ImuData ImuDriver::read_data() {
       (int16_t)wiringPiI2CReadReg16(fd_imu_, LSM6DSOX_OUTX_L_A + 4);
 
   // magnetometer
-  int16_t raw_mx = (int16_t)wiringPiI2CReadReg16(fd_mag_, LIS3MDL_OUT_X_L);
-  int16_t raw_my = (int16_t)wiringPiI2CReadReg16(fd_mag_, LIS3MDL_OUT_X_L + 2);
-  int16_t raw_mz = (int16_t)wiringPiI2CReadReg16(fd_mag_, LIS3MDL_OUT_X_L + 4);
+  int16_t raw_mx =
+      (int16_t)wiringPiI2CReadReg16(fd_mag_, LIS3MDL_OUT_X_L | 0x80);
+  int16_t raw_my =
+      (int16_t)wiringPiI2CReadReg16(fd_mag_, (LIS3MDL_OUT_X_L + 2) | 0x80);
+  int16_t raw_mz =
+      (int16_t)wiringPiI2CReadReg16(fd_mag_, (LIS3MDL_OUT_X_L + 4) | 0x80);
 
   // conversions
-  // Accel: 4g range -> 0.122 mg/LSB (table 2)
-  const float accel_scale = 0.122f * 9.81f / 1000.0f;
+  // Accel: 2g range -> 0.061 mg/LSB (table 2)
+  const float accel_scale = 0.061f * 9.81f / 1000.0f;
   data.ax = raw_ax * accel_scale;
   data.ay = raw_ay * accel_scale;
   data.az = raw_az * accel_scale;
 
-  // Gyro: 2000dps range -> 8.75 mdps/LSB (table 2)
-  const float gyro_scale = 7.75f / 1000.0f * M_PI / 180.0f;
+  // Gyro: 250dps range -> 8.75 mdps/LSB (table 2)
+  const float gyro_scale = 8.75f / 1000.0f * M_PI / 180.0f;
   data.gx = raw_gx * gyro_scale;
   data.gy = raw_gy * gyro_scale;
   data.gz = raw_gz * gyro_scale;

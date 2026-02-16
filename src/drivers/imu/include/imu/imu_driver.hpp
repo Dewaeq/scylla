@@ -15,6 +15,7 @@ public:
   ImuData read_data();
 
 private:
+  const int POWER_PIN = 4;
   // IMU:
   const int LSM6DSOX_ADDR = 0x6A;
   const int LSM6DSOX_WHO_AM_I = 0x0F;
@@ -23,7 +24,7 @@ private:
   const int LSM6DSOX_OUTX_L_G = 0x22;
   const int LSM6DSOX_OUTX_L_A = 0x28;
   // Magnetometer:
-  const int LIS3MDL_ADDR = 0x10;
+  const int LIS3MDL_ADDR = 0x1C;
   const int LIS3MDL_WHO_AM_I = 0x0F;
   const int LIS3MDL_CTRL_REG1 = 0x20;
   const int LIS3MDL_CTRL_REG2 = 0x21;
