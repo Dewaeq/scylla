@@ -10,9 +10,7 @@ public:
   Lsm6dsoxDriver();
 
   bool begin();
-
   bool has_data();
-
   Lsm6dsoxData read();
 
 private:
