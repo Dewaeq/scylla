@@ -21,7 +21,7 @@ windows:
       panes:
         - control:
             - echo "Starting Control..."
-            - ./build/bin/control_node
+            - sudo -E ./build/bin/control_node
   - debug:
       layout: tiled 
       panes:
