@@ -30,7 +30,7 @@ LidarNode::LidarNode() : LcmNode("lidar_node") {
     auto res = driver_->getDeviceInfo(deviceInfo);
     if (SL_IS_OK(res)) {
       std::string info_str;
-      info(std::format(
+      info(fmt::format(
           "Model: {}, Firmware Version: {}.{}, Hardware Version: {}\n",
           deviceInfo.model, deviceInfo.firmware_version >> 8,
           deviceInfo.firmware_version & 0xffu, deviceInfo.hardware_version));
