@@ -1,0 +1,37 @@
+name: scylla
+root: .
+
+pre_window: source env.sh
+
+windows:
+  - sensors_and_odom:
+      layout: tiled 
+      panes:
+        - lidar:
+            - echo "Starting Lidar..."
+            - ./build/bin/lidar_node
+        - imu:
+            - echo "Starting IMU..."
+            - ./build/bin/imu_mag_node
+        - flow:
+            - echo "Starting Optical Flow..."
+            - ./build/bin/flow_node
+  - control:
+      layout: tiled 
+      panes:
+        - control:
+            - echo "Starting Control..."
+            - sudo -E ./build/bin/control_node
+  - debug:
+      layout: tiled 
+      panes:
+        - throttled:
+          - watch -n 1 vcgencmd get_throttled
+        - logger:
+          - mkdir logs
+          - cd logs
+          - lcm-logger
+  - resources:
+      panes:
+        - btop:
+            - btop
