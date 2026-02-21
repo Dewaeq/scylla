@@ -1,0 +1,10 @@
+package scylla_msgs;
+
+struct mag_t
+{
+  int64_t timestamp;
+
+  float mx;
+  float my;
+  float mz;
+}

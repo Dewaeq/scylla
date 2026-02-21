@@ -1,0 +1,14 @@
+package scylla_msgs;
+
+struct imu_t
+{
+  int64_t timestamp;
+
+  float ax;
+  float ay;
+  float az;
+
+  float gx;
+  float gy;
+  float gz;
+}

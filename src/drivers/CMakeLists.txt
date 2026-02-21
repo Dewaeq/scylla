@@ -1,3 +1,5 @@
 add_subdirectory(external)
 add_subdirectory(motor)
 add_subdirectory(flow)
+add_subdirectory(lsm6dsox)
+add_subdirectory(lis3mdl)
