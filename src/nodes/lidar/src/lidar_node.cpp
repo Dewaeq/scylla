@@ -29,12 +29,10 @@ LidarNode::LidarNode() : LcmNode("lidar_node") {
     sl_lidar_response_device_info_t deviceInfo;
     auto res = driver_->getDeviceInfo(deviceInfo);
     if (SL_IS_OK(res)) {
-      std::string info_str;
       info(fmt::format(
-          "Model: {}, Firmware Version: {}.{}, Hardware Version: {}\n",
+          "Model: {}, Firmware Version: {}.{}, Hardware Version: {}",
           deviceInfo.model, deviceInfo.firmware_version >> 8,
           deviceInfo.firmware_version & 0xffu, deviceInfo.hardware_version));
-      info(info_str);
     } else {
       error("failed to get device information from lidar: " +
             std::to_string(res));
@@ -58,17 +56,27 @@ LidarNode::LidarNode() : LcmNode("lidar_node") {
   // give it a moment
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
-  LidarScanMode scan_mode;
-  driver_->startScan(false, true, 0, &scan_mode);
-  LidarMotorInfo motor_info;
-  driver_->getMotorInfo(motor_info);
+  LidarScanMode target_mode;
+  bool mode_found = false;
 
-  info(fmt::format("Motor info: min speed={}, max speed={}, desired speed={}",
-                   motor_info.min_speed, motor_info.max_speed,
-                   motor_info.desired_speed));
+  for (const auto &mode : scan_modes) {
+    if (std::string(mode.scan_mode) == "Standard") {
+      target_mode = mode;
+      mode_found = true;
+      break;
+    }
+  }
 
-  driver_->setMotorSpeed();
-  info("starting scan in mode: " + std::string(scan_mode.scan_mode));
+  LidarScanMode used_mode;
+  if (!mode_found) {
+    driver_->startScan(false, true, 0, &used_mode);
+    info(fmt::format("Standard mode not found, falling back to {} mode",
+                     used_mode.scan_mode));
+  } else {
+    driver_->startScanExpress(false, target_mode.id, 0, &used_mode);
+    info(fmt::format("Requested mode {}, using mode {}", target_mode.scan_mode,
+                     used_mode.scan_mode));
+  }
 }
 
 void LidarNode::update() {
