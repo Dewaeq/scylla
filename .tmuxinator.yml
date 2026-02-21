@@ -1,6 +1,8 @@
 name: scylla
 root: .
 
+pre_window: source env.sh
+
 windows:
   - sensors_and_odom:
       layout: tiled 
@@ -26,6 +28,8 @@ windows:
         - throttled:
           - watch -n 1 vcgencmd get_throttled
         - logger:
+          - mkdir logs
+          - cd logs
           - lcm-logger
   - resources:
       panes:
