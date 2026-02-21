@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 set(CMAKE_CXX_STANDARD 20)
 project(scylla CXX)
 
+find_package(fmt REQUIRED)
 find_package(lcm REQUIRED)
 
 # set output directories

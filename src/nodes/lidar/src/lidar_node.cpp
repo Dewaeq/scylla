@@ -2,10 +2,11 @@
 
 #include "common/lcm_node.hpp"
 #include "scylla_msgs/lidar_t.hpp"
+#include "sl_lidar_driver.h"
 #include <chrono>
 #include <cmath>
 #include <cstdio>
-#include <sstream>
+#include <fmt/core.h>
 #include <thread>
 
 LidarNode::LidarNode() : LcmNode("lidar_node") {
@@ -28,12 +29,10 @@ LidarNode::LidarNode() : LcmNode("lidar_node") {
     sl_lidar_response_device_info_t deviceInfo;
     auto res = driver_->getDeviceInfo(deviceInfo);
     if (SL_IS_OK(res)) {
-      std::string info_str;
-      sprintf(info_str.data(),
-              "Model: %d, Firmware Version: %d.%d, Hardware Version: %d\n",
-              deviceInfo.model, deviceInfo.firmware_version >> 8,
-              deviceInfo.firmware_version & 0xffu, deviceInfo.hardware_version);
-      info(info_str);
+      info(fmt::format(
+          "Model: {}, Firmware Version: {}.{}, Hardware Version: {}",
+          deviceInfo.model, deviceInfo.firmware_version >> 8,
+          deviceInfo.firmware_version & 0xffu, deviceInfo.hardware_version));
     } else {
       error("failed to get device information from lidar: " +
             std::to_string(res));
@@ -49,19 +48,35 @@ LidarNode::LidarNode() : LcmNode("lidar_node") {
 
   info("Lidar scan modes:");
   for (const auto &scan_mode : scan_modes) {
-    std::stringstream ss;
-    ss << scan_mode.scan_mode << "\t" << "max dist: " << scan_mode.max_distance
-       << "  µs: " << scan_mode.us_per_sample;
-    info(ss.str());
+    info(fmt::format("{}\t max dist: {}  µs: {}", scan_mode.scan_mode,
+                     scan_mode.max_distance, scan_mode.us_per_sample));
   }
 
   driver_->reset();
   // give it a moment
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
-  LidarScanMode scan_mode;
-  driver_->startScan(false, true, 0, &scan_mode);
-  info("default scan mode: " + std::string(scan_mode.scan_mode));
+  LidarScanMode target_mode;
+  bool mode_found = false;
+
+  for (const auto &mode : scan_modes) {
+    if (std::string(mode.scan_mode) == "Standard") {
+      target_mode = mode;
+      mode_found = true;
+      break;
+    }
+  }
+
+  LidarScanMode used_mode;
+  if (!mode_found) {
+    driver_->startScan(false, true, 0, &used_mode);
+    info(fmt::format("Standard mode not found, falling back to {} mode",
+                     used_mode.scan_mode));
+  } else {
+    driver_->startScanExpress(false, target_mode.id, 0, &used_mode);
+    info(fmt::format("Requested mode {}, using mode {}", target_mode.scan_mode,
+                     used_mode.scan_mode));
+  }
 }
 
 void LidarNode::update() {
