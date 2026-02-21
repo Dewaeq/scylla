@@ -3,7 +3,8 @@
 #include "common/lcm_node.hpp"
 #include "imu_mag/imu_mag_node.hpp"
 #include "lis3mdl/lis3mdl_driver.hpp"
-#include <sstream>
+#include "scylla_msgs/imu_t.hpp"
+#include "scylla_msgs/mag_t.hpp"
 #include <wiringPi.h>
 
 ImuMagNode::ImuMagNode() : LcmNode("imu_mag_node") {
@@ -36,20 +37,25 @@ void ImuMagNode::update() {
   static Lsm6dsoxData imu_data;
   static Lis3mdlData mag_data;
 
+  static scylla_msgs::imu_t imu_msg;
+  static scylla_msgs::mag_t mag_msg;
+
   if (imu_driver_.has_data() && imu_driver_.read(imu_data)) {
-    std::stringstream s;
-    s << "[imu data]: "
-      << "\tax: " << imu_data.ax << "\tay: " << imu_data.ay
-      << "\taz: " << imu_data.az << std::endl
-      << "\tgx: " << imu_data.gx << "\tgy: " << imu_data.gy
-      << "\tgz: " << imu_data.gz;
-    // info(s.str());
+    imu_msg.timestamp = now_ns();
+    imu_msg.ax = imu_data.ax;
+    imu_msg.ay = imu_data.ay;
+    imu_msg.az = imu_data.az;
+
+    imu_msg.gx = imu_data.gx;
+    imu_msg.gy = imu_data.gy;
+    imu_msg.gz = imu_data.gz;
+    publish("sensors/imu", imu_msg);
   }
   if (mag_driver_.has_data() && mag_driver_.read(mag_data)) {
-    std::stringstream s;
-    s << "[mag data]: "
-      << "\tmx: " << mag_data.mx << "\tmy: " << mag_data.my
-      << "\tmz: " << mag_data.mz;
-    info(s.str());
+    mag_msg.timestamp = now_ns();
+    mag_msg.mx = mag_data.mx;
+    mag_msg.my = mag_data.my;
+    mag_msg.mz = mag_data.mz;
+    publish("sensors/mag", mag_msg);
   }
 }
