@@ -13,8 +13,12 @@ add_subdirectory(src)
 
 # configure LCM
 file(GLOB LCM_FILES lcm_types/*.lcm)
-set(LCM_GEN_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
-set(LCM_GEN_PYTHON_DIR ${CMAKE_BINARY_DIR}/python)
+set(LCM_GEN_INCLUDE_DIR ${CMAKE_BINARY_DIR}/lcm/include)
+set(LCM_GEN_PYTHON_DIR ${CMAKE_BINARY_DIR}/lcm/python)
+set(LCM_GEN_JAVA_DIR ${CMAKE_BINARY_DIR}/lcm/java)
+find_package(Java REQUIRED)
+include(UseJava)
+find_jar(LCM_JAR NAMES lcm)
 # dummy file that acts as a flag. If it's missing or older than the .lcm files,
 # CMake knows it needs to run the generator again
 set(LCM_GEN_STAMP ${CMAKE_CURRENT_BINARY_DIR}/lcm_gen.stamp)
@@ -23,6 +27,9 @@ add_custom_command(
   OUTPUT ${LCM_GEN_STAMP}
   COMMAND lcm-gen -x ${LCM_FILES} --cpp-hpath ${LCM_GEN_INCLUDE_DIR}
   COMMAND lcm-gen -p ${LCM_FILES} --ppath ${LCM_GEN_PYTHON_DIR}
+  COMMAND lcm-gen -j ${LCM_FILES} --jpath ${LCM_GEN_JAVA_DIR}
+  COMMAND javac -cp ${LCM_JAR} ${LCM_GEN_JAVA_DIR}/scylla_msgs/*.java
+  COMMAND jar cf ${LCM_GEN_JAVA_DIR}/scylla_types.jar -C ${LCM_GEN_JAVA_DIR} scylla_msgs
   COMMAND ${CMAKE_COMMAND} -E touch ${LCM_GEN_STAMP}
   DEPENDS ${LCM_FILES}
   COMMENT "generating LCM C++ headers..."
