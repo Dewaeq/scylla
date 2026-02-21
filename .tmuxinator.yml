@@ -4,7 +4,6 @@ root: .
 windows:
   - sensors_and_odom:
       layout: tiled 
-      synchronize: off
       panes:
         - lidar:
             - echo "Starting Lidar..."
@@ -17,8 +16,18 @@ windows:
             - ./build/bin/flow_node
   - control:
       layout: tiled 
-      synchronize: off
       panes:
         - control:
             - echo "Starting Control..."
             - ./build/bin/control_node
+  - debug:
+      layout: tiled 
+      panes:
+        - throttled:
+          - watch -n 1 vcgencmd get_throttled
+        - logger:
+          - lcm-logger
+  - resources:
+      panes:
+        - btop:
+            - btop
