@@ -2,10 +2,11 @@
 
 #include "common/lcm_node.hpp"
 #include "scylla_msgs/lidar_t.hpp"
+#include "sl_lidar_driver.h"
 #include <chrono>
 #include <cmath>
 #include <cstdio>
-#include <sstream>
+#include <fmt/core.h>
 #include <thread>
 
 LidarNode::LidarNode() : LcmNode("lidar_node") {
@@ -29,10 +30,10 @@ LidarNode::LidarNode() : LcmNode("lidar_node") {
     auto res = driver_->getDeviceInfo(deviceInfo);
     if (SL_IS_OK(res)) {
       std::string info_str;
-      sprintf(info_str.data(),
-              "Model: %d, Firmware Version: %d.%d, Hardware Version: %d\n",
-              deviceInfo.model, deviceInfo.firmware_version >> 8,
-              deviceInfo.firmware_version & 0xffu, deviceInfo.hardware_version);
+      info(std::format(
+          "Model: {}, Firmware Version: {}.{}, Hardware Version: {}\n",
+          deviceInfo.model, deviceInfo.firmware_version >> 8,
+          deviceInfo.firmware_version & 0xffu, deviceInfo.hardware_version));
       info(info_str);
     } else {
       error("failed to get device information from lidar: " +
@@ -49,10 +50,8 @@ LidarNode::LidarNode() : LcmNode("lidar_node") {
 
   info("Lidar scan modes:");
   for (const auto &scan_mode : scan_modes) {
-    std::stringstream ss;
-    ss << scan_mode.scan_mode << "\t" << "max dist: " << scan_mode.max_distance
-       << "  µs: " << scan_mode.us_per_sample;
-    info(ss.str());
+    info(fmt::format("{}\t max dist: {}  µs: {}", scan_mode.scan_mode,
+                     scan_mode.max_distance, scan_mode.us_per_sample));
   }
 
   driver_->reset();
@@ -61,7 +60,15 @@ LidarNode::LidarNode() : LcmNode("lidar_node") {
 
   LidarScanMode scan_mode;
   driver_->startScan(false, true, 0, &scan_mode);
-  info("default scan mode: " + std::string(scan_mode.scan_mode));
+  LidarMotorInfo motor_info;
+  driver_->getMotorInfo(motor_info);
+
+  info(fmt::format("Motor info: min speed={}, max speed={}, desired speed={}",
+                   motor_info.min_speed, motor_info.max_speed,
+                   motor_info.desired_speed));
+
+  driver_->setMotorSpeed();
+  info("starting scan in mode: " + std::string(scan_mode.scan_mode));
 }
 
 void LidarNode::update() {
