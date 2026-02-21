@@ -44,12 +44,13 @@ bool Lis3mdlDriver::has_data() {
   return (status & 0x08) == 0x08;
 }
 
-Lis3mdlData Lis3mdlDriver::read() {
-  Lis3mdlData data;
-
+bool Lis3mdlDriver::read(Lis3mdlData &data) {
   int16_t raw_mx = wiringPiI2CReadReg16(fd_, LIS3MDL_OUT_X_L | 0x80);
   int16_t raw_my = wiringPiI2CReadReg16(fd_, (LIS3MDL_OUT_X_L + 2) | 0x80);
   int16_t raw_mz = wiringPiI2CReadReg16(fd_, (LIS3MDL_OUT_X_L + 4) | 0x80);
+
+  if (raw_mx == -1 || raw_my == -1 || raw_mz == -1)
+    return false;
 
   // 4 gauss range -> 6842 LSB/gauss (table 2)
   // 1 Gauss = 100 uTesla
@@ -58,5 +59,5 @@ Lis3mdlData Lis3mdlDriver::read() {
   data.my = raw_my * scale;
   data.mz = raw_mz * scale;
 
-  return data;
+  return true;
 }

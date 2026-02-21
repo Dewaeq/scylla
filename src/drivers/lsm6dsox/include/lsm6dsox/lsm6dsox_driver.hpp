@@ -11,7 +11,7 @@ public:
 
   bool begin();
   bool has_data();
-  Lsm6dsoxData read();
+  bool read(Lsm6dsoxData &data);
 
 private:
   const int LSM6DSOX_ADDR = 0x6A;

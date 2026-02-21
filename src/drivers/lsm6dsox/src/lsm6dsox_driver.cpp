@@ -47,18 +47,22 @@ bool Lsm6dsoxDriver::has_data() {
   return (status & 0x03) == 0x03;
 }
 
-Lsm6dsoxData Lsm6dsoxDriver::read() {
-  Lsm6dsoxData data;
-
+bool Lsm6dsoxDriver::read(Lsm6dsoxData &data) {
   // gyro
   int16_t raw_gx = wiringPiI2CReadReg16(fd_, LSM6DSOX_OUTX_L_G);
   int16_t raw_gy = wiringPiI2CReadReg16(fd_, LSM6DSOX_OUTX_L_G + 2);
   int16_t raw_gz = wiringPiI2CReadReg16(fd_, LSM6DSOX_OUTX_L_G + 4);
 
+  if (raw_gx == -1 || raw_gy == -1 || raw_gz == -1)
+    return false;
+
   // accelerometer
   int16_t raw_ax = wiringPiI2CReadReg16(fd_, LSM6DSOX_OUTX_L_A);
   int16_t raw_ay = wiringPiI2CReadReg16(fd_, LSM6DSOX_OUTX_L_A + 2);
   int16_t raw_az = wiringPiI2CReadReg16(fd_, LSM6DSOX_OUTX_L_A + 4);
+
+  if (raw_ax == -1 || raw_ay == -1 || raw_az == -1)
+    return false;
 
   // conversions
   // Accel: 2g range -> 0.061 mg/LSB (table 2)
@@ -73,5 +77,5 @@ Lsm6dsoxData Lsm6dsoxDriver::read() {
   data.gy = raw_gy * gyro_scale;
   data.gz = raw_gz * gyro_scale;
 
-  return data;
+  return true;
 }

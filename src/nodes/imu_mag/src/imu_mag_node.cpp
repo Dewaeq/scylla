@@ -2,6 +2,7 @@
 
 #include "common/lcm_node.hpp"
 #include "imu_mag/imu_mag_node.hpp"
+#include "lis3mdl/lis3mdl_driver.hpp"
 #include <sstream>
 #include <wiringPi.h>
 
@@ -32,20 +33,23 @@ ImuMagNode::ImuMagNode() : LcmNode("imu_mag_node") {
 }
 
 void ImuMagNode::update() {
-  if (imu_driver_.has_data()) {
-    const auto data = imu_driver_.read();
+  static Lsm6dsoxData imu_data;
+  static Lis3mdlData mag_data;
+
+  if (imu_driver_.has_data() && imu_driver_.read(imu_data)) {
     std::stringstream s;
     s << "[imu data]: "
-      << "\tax: " << data.ax << "\tay: " << data.ay << "\taz: " << data.az
-      << std::endl
-      << "\tgx: " << data.gx << "\tgy: " << data.gy << "\tgz: " << data.gz;
+      << "\tax: " << imu_data.ax << "\tay: " << imu_data.ay
+      << "\taz: " << imu_data.az << std::endl
+      << "\tgx: " << imu_data.gx << "\tgy: " << imu_data.gy
+      << "\tgz: " << imu_data.gz;
     // info(s.str());
   }
-  if (mag_driver_.has_data()) {
-    const auto data = mag_driver_.read();
+  if (mag_driver_.has_data() && mag_driver_.read(mag_data)) {
     std::stringstream s;
     s << "[mag data]: "
-      << "\tmx: " << data.mx << "\tmy: " << data.my << "\tmz: " << data.mz;
+      << "\tmx: " << mag_data.mx << "\tmy: " << mag_data.my
+      << "\tmz: " << mag_data.mz;
     info(s.str());
   }
 }

@@ -10,7 +10,7 @@ public:
 
   bool begin();
   bool has_data();
-  Lis3mdlData read();
+  bool read(Lis3mdlData &data);
 
 private:
   const int LIS3MDL_ADDR = 0x1C;
